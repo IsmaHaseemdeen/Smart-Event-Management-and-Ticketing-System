@@ -1,0 +1,106 @@
+﻿@model EventTicketingSystem.Models.ViewModels.BookingCreateVM
+@{
+    ViewData["Title"] = "Book Tickets";
+}
+
+<div class="container booking-wrap">
+    <h2 class="page-title mb-1">Book Tickets</h2>
+
+    <div class="page-subtitle mb-3">
+        <div class="fw-semibold">@Model.EventTitle</div>
+        <div>@Model.VenueName @(!string.IsNullOrWhiteSpace(Model.City) ? (" - " + Model.City) : "")</div>
+        <div>Session: @Model.StartText</div>
+    </div>
+
+    @if (TempData["Err"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Err"]</div>
+    }
+
+    <form asp-action="Create" method="post" class="card panel-card">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="SessionId" />
+
+        <div class="card-body">
+
+            <div class="row g-3 align-items-end mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Ticket type</label>
+                    <select class="form-select select-pill" name="selectedTicketTypeId" required>
+                        <option value="">Select a ticket type</option>
+                        @for (int i = 0; i < (Model.Tickets?.Count ?? 0); i++)
+                        {
+                            <option value="@Model.Tickets[i].TicketTypeId">
+                                @Model.Tickets[i].TypeName (@Model.Tickets[i].Price.ToString("0.00")) - Remaining: @Model.Tickets[i].Remaining
+                            </option>
+                        }
+                    </select>
+                    <div class="form-text">Choose the ticket type first, then enter quantity in the table below.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+                        <span class="ticket-chip ticket-standard">Standard</span>
+                        <span class="ticket-chip ticket-plus">Standard Plus</span>
+                        <span class="ticket-chip ticket-vip-gold">VIP Gold</span>
+                        <span class="ticket-chip ticket-vip-platinum">VIP Platinum</span>
+                        <span class="ticket-chip ticket-balcony-front">Balcony Front</span>
+                        <span class="ticket-chip ticket-balcony-rear">Balcony Rear</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Ticket Type</th>
+                            <th class="text-end">Price</th>
+                            <th class="text-end">Remaining</th>
+                            <th style="width:140px;" class="text-end">Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < (Model.Tickets?.Count ?? 0); i++)
+                        {
+                            var name = Model.Tickets[i].TypeName?.ToLower() ?? "";
+                            var cls =
+                            name.Contains("vip") && name.Contains("gold") ? "ticket-vip-gold" :
+                            name.Contains("vip") && name.Contains("platinum") ? "ticket-vip-platinum" :
+                            name.Contains("balcony") && name.Contains("front") ? "ticket-balcony-front" :
+                            name.Contains("balcony") && name.Contains("rear") ? "ticket-balcony-rear" :
+                            name.Contains("plus") ? "ticket-plus" :
+                                            "ticket-standard";
+
+                            <tr>
+                                <td>
+                                    <span class="ticket-chip @cls">@Model.Tickets[i].TypeName</span>
+
+                                    <input type="hidden" asp-for="Tickets[i].TicketTypeId" />
+                                    <input type="hidden" asp-for="Tickets[i].TypeName" />
+                                    <input type="hidden" asp-for="Tickets[i].Price" />
+                                    <input type="hidden" asp-for="Tickets[i].Remaining" />
+                                </td>
+                                <td class="text-end">@Model.Tickets[i].Price.ToString("0.00")</td>
+                                <td class="text-end">@Model.Tickets[i].Remaining</td>
+                                <td class="text-end">
+                                    <input asp-for="Tickets[i].Qty" class="form-control form-control-sm text-end" type="number" min="0" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="actions-row mt-3">
+                <button class="btn btn-success btn-theme" type="submit">Continue</button>
+                <a class="btn btn-outline-secondary btn-theme" asp-controller="Event" asp-action="Details" asp-route-id="@ViewBag.EventId">Back</a>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

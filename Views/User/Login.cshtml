@@ -1,0 +1,99 @@
+﻿@{
+    ViewData["Title"] = "Login";
+
+    var toastMessage = TempData["ToastMessage"] as string ?? ViewBag.Message as string;
+    var toastType = TempData["ToastType"] as string ?? "danger";
+}
+
+<div class="container auth-wrap">
+    <div class="row justify-content-center w-100">
+        <div class="col-12 col-md-8 col-lg-5">
+
+            <div class="text-center mb-4">
+                <h2 class="fw-bold auth-title mb-1">Welcome back</h2>
+                <div class="text-muted">Sign in to continue</div>
+            </div>
+
+            <div class="card auth-card">
+                <div class="card-body">
+
+                    <form asp-action="Login" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email</label>
+                            <input name="email"
+                                   type="email"
+                                   class="form-control auth-input"
+                                   placeholder="name@example.com"
+                                   required />
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label fw-semibold">Password</label>
+                            <input name="password"
+                                   type="password"
+                                   class="form-control auth-input"
+                                   placeholder="Enter your password"
+                                   minlength="6"
+                                   required />
+                            <div class="invalid-feedback">Please enter your password (min 6 characters).</div>
+                        </div>
+
+                        <button class="btn btn-success w-100 auth-primary-btn mt-4" type="submit">
+                            Login
+                        </button>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <a class="btn btn-outline-secondary btn-sm auth-link-btn"
+                               asp-action="Register">
+                                Create account
+                            </a>
+                        </div>
+
+                        <hr class="my-4" />
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(toastMessage))
+{
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:1080;">
+        <div id="pageToast" class="toast align-items-center text-bg-@toastType border-0"
+             role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">@toastMessage</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const forms = document.querySelectorAll('form[novalidate]');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) { event.preventDefault(); event.stopPropagation(); }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+
+        (function () {
+            const el = document.getElementById('pageToast');
+            if (!el) return;
+            const toast = new bootstrap.Toast(el, { delay: 4500 });
+            toast.show();
+        })();
+    </script>
+}

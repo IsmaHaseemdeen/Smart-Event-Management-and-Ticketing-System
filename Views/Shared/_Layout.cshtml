@@ -1,0 +1,208 @@
+﻿@using Microsoft.AspNetCore.Http
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Smart Event Management System</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/EventTicketingSystem.styles.css" asp-append-version="true" />
+
+    <style>
+        /* navbar */
+        .navbar.taller-nav {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        /* logo */
+        .brand-logo {
+            height: 60px;
+            width: auto;
+            display: block;
+        }
+
+        /*  nav links  */
+        .navbar .nav-link {
+            padding-top: 14px;
+            padding-bottom: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm mb-3 taller-nav">
+            <div class="container-fluid">
+
+                <a class="navbar-brand d-flex align-items-center"
+                   asp-controller="Home" asp-action="Index">
+
+                    <!-- logo -->
+                    <img class="brand-logo"
+                         src="~/Images/Logo.png"
+                         alt="Watertown Cultural Council Logo" />
+
+                </a>
+
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="mainNavbar">
+
+                    @{
+                        var email = Context.Session.GetString("UserEmail");
+                        var role = (Context.Session.GetString("UserRole") ?? "").Trim();
+                        var isLoggedIn = !string.IsNullOrEmpty(email);
+
+                        var isMember = isLoggedIn && role.Equals("MEMBER", StringComparison.OrdinalIgnoreCase);
+                        var isStaff = isLoggedIn && role.Equals("STAFF", StringComparison.OrdinalIgnoreCase);
+                        var isAdmin = isLoggedIn && role.Equals("ADMIN", StringComparison.OrdinalIgnoreCase);
+                        var isGuest = !isLoggedIn;
+                    }
+
+                    <!-- LEFT SIDE NAVIGATION -->
+                    <ul class="navbar-nav me-auto">
+
+                        <!--Guest Navigation -->
+                        @if (isGuest)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Event" asp-action="Index">Events</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Inquiry" asp-action="Create">Submit Inquiry</a>
+                            </li>
+                        }
+
+                        <!--Member Navigation -->
+                        @if (isMember)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Event" asp-action="Index">Events</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Inquiry" asp-action="Create">Submit Inquiry</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Member" asp-action="Profile">My Profile</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Bookings" asp-action="MyBookings">My Bookings</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Inquiry" asp-action="My">My Inquiries</a>
+                            </li>
+                        }
+
+                        <!-- Admin Navigation -->
+                        @if (isAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Admin" asp-action="Index">Home</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="AdminEvents" asp-action="Index">Events</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="AdminCategories" asp-action="Index">Categories</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="AdminVenues" asp-action="Index">Venues</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="AdminReviews" asp-action="Index">Review Check</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="AdminInquiries" asp-action="Index">Inquiries</a>
+                            </li>
+                        }
+
+                        <!--Staff Navigation-->
+                        @if (isStaff)
+                        {
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Staff" asp-action="Verify">Verify Tickets</a>
+                            </li>
+                        }
+
+                    </ul>
+
+                    <!-- RIGHT SIDE -->
+                    <ul class="navbar-nav">
+
+                        @if (isGuest)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="User" asp-action="Register">Register</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="User" asp-action="Login">Login</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-muted">@email</span>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="User" asp-action="Logout">Logout</a>
+                            </li>
+                        }
+
+                    </ul>
+
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted mt-4">
+        <div class="container d-flex justify-content-between align-items-center py-2">
+            <span>&copy; @DateTime.Now.Year - Smart Event Management System</span>
+            <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

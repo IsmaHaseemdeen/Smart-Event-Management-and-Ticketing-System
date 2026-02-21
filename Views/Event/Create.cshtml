@@ -1,0 +1,59 @@
+﻿@model List<EventTicketingSystem.Models.ViewModels.EventCardVM>
+@{
+    ViewData["Title"] = "Events";
+}
+
+<h2 class="mb-3">Upcoming Events</h2>
+
+<div class="row g-3">
+    @foreach (var e in Model)
+    {
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="card-title">@e.Title</h5>
+
+                        @if (e.Availability == "Full")
+                        {
+                            <span class="badge bg-danger">Full</span>
+                        }
+                        else if (e.Availability == "Few Left")
+                        {
+                            <span class="badge bg-warning text-dark">Few Left</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Available</span>
+                        }
+                    </div>
+
+                    <p class="mb-1 text-muted">@e.VenueName, @e.City</p>
+
+                    @if (e.UpcomingStart != null)
+                    {
+                        <p class="mb-1">Next: @e.UpcomingStart.Value.ToString("yyyy-MM-dd HH:mm")</p>
+                    }
+                    else
+                    {
+                        <p class="mb-1">No upcoming sessions</p>
+                    }
+
+                    @if (e.StartingPrice != null)
+                    {
+                        <p class="mb-0">From: Rs. @e.StartingPrice.Value</p>
+                    }
+                </div>
+
+                <div class="card-footer bg-white border-0">
+                    <a class="btn btn-sm btn-outline-primary"
+                       asp-controller="Events"
+                       asp-action="Details"
+                       asp-route-id="@e.EventId">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

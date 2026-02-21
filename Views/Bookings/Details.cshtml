@@ -1,0 +1,151 @@
+﻿@model EventTicketingSystem.Models.Booking
+@{
+    ViewData["Title"] = "Booking Details";
+
+    var bookingStatus = (Model.BookingStatus ?? "").ToUpperInvariant();
+    var payStatus = (Model.Payment?.PaymentStatus ?? "").ToUpperInvariant();
+
+    bool isPending = bookingStatus == "PENDING";
+    bool isConfirmed = bookingStatus == "CONFIRMED";
+
+    bool paySuccess = payStatus == "SUCCESS";
+    bool payFailed = payStatus == "FAILED";
+
+    var sessionStart = Model.Session?.StartDatetime;
+    var isUsed = string.Equals(Model.IsUsed, "Y", StringComparison.OrdinalIgnoreCase);
+}
+
+<h2 class="mb-2">Booking Details</h2>
+
+@if (TempData["Msg"] != null)
+{
+    <div class="alert alert-success">@TempData["Msg"]</div>
+}
+@if (TempData["Err"] != null)
+{
+    <div class="alert alert-danger">@TempData["Err"]</div>
+}
+
+<div class="card mb-3 shadow-sm">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <div class="fw-bold fs-5">@Model.BookingCode</div>
+                <div class="text-muted">Booking ID: @Model.BookingId</div>
+            </div>
+
+            <div class="text-end">
+                @if (isConfirmed)
+                {
+                    <span class="badge bg-success">CONFIRMED</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark">PENDING</span>
+                }
+
+                @if (paySuccess)
+                {
+                    <span class="badge bg-primary ms-2">PAYMENT: SUCCESS</span>
+                }
+                else if (payFailed)
+                {
+                    <span class="badge bg-danger ms-2">PAYMENT: FAILED</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary ms-2">PAYMENT: PENDING</span>
+                }
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row g-2">
+            <div class="col-md-6">
+                <div><b>Event:</b> @Model.Session?.Event?.Title</div>
+                <div class="text-muted">
+                    @Model.Session?.Event?.Venue?.VenueName
+                    @if (!string.IsNullOrWhiteSpace(Model.Session?.Event?.Venue?.City))
+                    {
+                        <span>, @Model.Session.Event.Venue.City</span>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div><b>Session:</b> @(sessionStart.HasValue? sessionStart.Value.ToString("yyyy-MM-dd HH:mm") : "-")</div>
+                <div><b>Total:</b> @Model.TotalAmount.ToString("0.00")</div>
+            </div>
+
+            <div class="col-md-6">
+                <div><b>Booking Date:</b> @Model.BookingDate.ToString("yyyy-MM-dd HH:mm")</div>
+                <div><b>Issued At:</b> @Model.IssuedAt.ToString("yyyy-MM-dd HH:mm")</div>
+            </div>
+
+            <div class="col-md-6">
+                <div>
+                    <b>Check-in:</b>
+                    @if (isUsed)
+                    {
+                        <span class="badge bg-success">USED</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">NOT USED</span>
+                    }
+                </div>
+                <div class="text-muted small">
+                    Checked-in by (user id): @(Model.CheckedInBy.HasValue? Model.CheckedInBy.Value.ToString() : "-")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h5 class="mb-2">Tickets</h5>
+<div class="table-responsive">
+    <table class="table table-sm align-middle">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th class="text-end">Qty</th>
+                <th class="text-end">Unit</th>
+                <th class="text-end">Line Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.BookedTickets != null && Model.BookedTickets.Count > 0)
+            {
+                @foreach (var t in Model.BookedTickets)
+                {
+                    <tr>
+                        <td>@(t.TicketType?.TypeName ?? "-")</td>
+                        <td class="text-end">@t.Quantity</td>
+                        <td class="text-end">@t.UnitPrice.ToString("0.00")</td>
+                        <td class="text-end">@t.LineTotal.ToString("0.00")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-muted">No ticket rows.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-3 d-flex gap-2 flex-wrap">
+    @if (isPending && Model.Payment != null && !paySuccess)
+    {
+        <form asp-action="Pay" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.BookingId" />
+            <button class="btn btn-success">Pay Now (Demo)</button>
+        </form>
+    }
+
+    <a class="btn btn-outline-secondary" asp-action="MyBookings">Back</a>
+</div>

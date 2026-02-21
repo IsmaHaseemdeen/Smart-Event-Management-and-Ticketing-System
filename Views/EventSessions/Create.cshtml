@@ -1,0 +1,53 @@
+﻿@model EventTicketingSystem.Models.EventSession
+
+@{
+    ViewData["Title"] = "Create Session";
+}
+
+<h1>Create Session</h1>
+
+<h4>EventSession</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="EventId" class="control-label"></label>
+                <input asp-for="EventId" class="form-control" />
+                <span asp-validation-for="EventId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StartDatetime" class="control-label"></label>
+                <input asp-for="StartDatetime" class="form-control" type="datetime-local" />
+                <span asp-validation-for="StartDatetime" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="EndDatetime" class="control-label"></label>
+                <input asp-for="EndDatetime" class="form-control" type="datetime-local" />
+                <span asp-validation-for="EndDatetime" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="SessionStatus" class="control-label"></label>
+                <input asp-for="SessionStatus" class="form-control" />
+                <span asp-validation-for="SessionStatus" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

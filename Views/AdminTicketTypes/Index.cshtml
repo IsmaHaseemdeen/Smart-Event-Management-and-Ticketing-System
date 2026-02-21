@@ -1,0 +1,51 @@
+﻿@model List<EventTicketingSystem.Models.TicketType>
+@{
+    ViewData["Title"] = "Ticket Types";
+    var sessionId = (int)ViewBag.SessionId;
+}
+
+<h2 class="mb-2">Ticket Types</h2>
+<div class="text-muted mb-3">@ViewBag.EventTitle | Session: @ViewBag.SessionStart</div>
+
+<div class="mb-3 d-flex gap-2 flex-wrap">
+    <a class="btn btn-primary" asp-action="Create" asp-route-sessionId="@sessionId">+ Add Ticket Type</a>
+
+    <a class="btn btn-outline-secondary"
+       asp-controller="AdminSessions"
+       asp-action="Index"
+       asp-route-eventId="@Context.Request.Query["eventId"]">Back</a>
+</div>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-secondary">No ticket types yet.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th class="text-end"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in Model)
+                {
+                    <tr>
+                        <td>@t.TypeName</td>
+                        <td>@t.Price.ToString("0.00")</td>
+                        <td>@t.Status</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@t.TicketTypeId">Edit</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@t.TicketTypeId">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

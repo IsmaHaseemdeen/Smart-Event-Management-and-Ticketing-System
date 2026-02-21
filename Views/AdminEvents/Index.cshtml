@@ -1,0 +1,117 @@
+﻿@model List<EventTicketingSystem.Models.Event>
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Events";
+
+    var venueSelect = ViewBag.VenueId as SelectList;
+    var categorySelect = ViewBag.CategoryId as SelectList;
+
+    int? selectedVenueId = ViewBag.SelectedVenueId as int?;
+    int? selectedCategoryId = ViewBag.SelectedCategoryId as int?;
+}
+
+<h2>Events</h2>
+
+<a class="btn btn-primary mb-3" asp-action="Create">+ Add Event</a>
+
+<!-- Filters -->
+<form method="get" class="card card-body mb-4">
+    <div class="row g-2">
+        <div class="col-md-4">
+            <label class="form-label">Venue</label>
+            <select class="form-select" name="venueId">
+                <option value="">All Venues</option>
+                @if (venueSelect != null)
+                {
+                    foreach (var item in venueSelect)
+                    {
+                        <option value="@item.Value" selected="@(item.Value == (selectedVenueId?.ToString() ?? ""))">
+                            @item.Text
+                        </option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Category</label>
+            <select class="form-select" name="categoryId">
+                <option value="">All Categories</option>
+                @if (categorySelect != null)
+                {
+                    foreach (var item in categorySelect)
+                    {
+                        <option value="@item.Value" selected="@(item.Value == (selectedCategoryId?.ToString() ?? ""))">
+                            @item.Text
+                        </option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end gap-2">
+            <button class="btn btn-success" type="submit">Apply</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Reset</a>
+        </div>
+    </div>
+</form>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-secondary">No events found.</div>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Venue</th>
+                <th>Categories</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th class="text-end"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in Model)
+            {
+                <tr>
+                    <td>@e.Title</td>
+                    <td>@(e.Venue?.VenueName ?? "")</td>
+
+                    <td>
+                        @if (e.EventCategories != null && e.EventCategories.Count > 0)
+                        {
+                            foreach (var ec in e.EventCategories)
+                            {
+                                if (ec.Category != null)
+                                {
+                                    <span class="badge bg-secondary me-1">@ec.Category.CategoryName</span>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </td>
+
+                    <td>@e.Status</td>
+                    <td>@e.CreatedAt.ToString("yyyy-MM-dd")</td>
+
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@e.EventId">Edit</a>
+                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@e.EventId">Delete</a>
+
+                        <a class="btn btn-sm btn-outline-success"
+                           asp-controller="AdminSessions"
+                           asp-action="Index"
+                           asp-route-eventId="@e.EventId">Sessions</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

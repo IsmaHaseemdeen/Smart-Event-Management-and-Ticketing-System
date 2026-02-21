@@ -1,0 +1,66 @@
+﻿@{
+    ViewData["Title"] = "Verify Ticket";
+}
+
+<h2 class="mb-3">Verify Ticket</h2>
+
+<form asp-action="Verify" method="post" class="card shadow-sm">
+    @Html.AntiForgeryToken()
+    <div class="card-body">
+
+        <div class="mb-3">
+            <label class="form-label">Booking Code</label>
+            <input name="bookingCode" class="form-control" placeholder="e.g., BK2026..." />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Last 2 digits of Phone</label>
+            <input name="phoneLast2" class="form-control" maxlength="2" placeholder="e.g., 45" />
+            <div class="form-text">We verify using booking code + last 2 digits of member phone.</div>
+        </div>
+
+        <button class="btn btn-primary">Verify</button>
+
+    </div>
+</form>
+
+@if (ViewBag.Result != null)
+{
+    <div class="mt-3">
+        @if (ViewBag.Result == "VALID")
+        {
+            <div class="alert alert-success">
+                 Valid ticket. Checked-in successfully.<br />
+                <b>Booking:</b> @ViewBag.BookingCode <br />
+                <b>Member:</b> @ViewBag.MemberName <br />
+                <b>Qty:</b> @ViewBag.Qty
+            </div>
+        }
+        else if (ViewBag.Result == "ALREADY_USED")
+        {
+            <div class="alert alert-warning">
+                 Ticket already used. <b>@ViewBag.BookingCode</b>
+            </div>
+        }
+        else if (ViewBag.Result == "NOT_CONFIRMED")
+        {
+            <div class="alert alert-danger"> Booking is not confirmed.</div>
+        }
+        else if (ViewBag.Result == "NOT_PAID")
+        {
+            <div class="alert alert-danger"> Payment is not confirmed (SUCCESS). Do not allow entry.</div>
+        }
+        else if (ViewBag.Result == "PHONE_MISMATCH")
+        {
+            <div class="alert alert-danger"> Phone last 2 digits do not match.</div>
+        }
+        else if (ViewBag.Result == "NOT_FOUND")
+        {
+            <div class="alert alert-danger">Booking code not found.</div>
+        }
+        else
+        {
+            <div class="alert alert-danger"> Invalid input.</div>
+        }
+    </div>
+}

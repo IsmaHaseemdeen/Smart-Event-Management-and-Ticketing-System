@@ -1,0 +1,165 @@
+﻿@model EventTicketingSystem.Models.ViewModels.EventDetailsVM
+
+@{
+    ViewData["Title"] = "Event Details";
+    bool hasFinishedSession = ViewBag.HasFinishedSession ?? false;
+    bool hasUpcomingSession = ViewBag.HasUpcomingSession ?? false;
+}
+
+<div class="container details-wrap">
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+            <h2 class="mb-1">@Model.Title</h2>
+            <div class="text-muted">@Model.VenueName, @Model.City</div>
+        </div>
+
+        @if (hasUpcomingSession)
+        {
+            <span class="badge-soft emerald">Upcoming</span>
+        }
+        else
+        {
+            <span class="badge-soft dark">Finished</span>
+        }
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.PosterUrl))
+    {
+        <div class="poster-wrap">
+            <img src="@Model.PosterUrl" class="poster-portrait" alt="Event poster" />
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
+    {
+        <div class="card panel-card mb-4">
+            <div class="card-body">
+                <div class="fw-bold mb-2">About this event</div>
+                <div class="text-muted">@Model.Description</div>
+            </div>
+        </div>
+    }
+
+    <div class="card panel-card mb-4">
+        <div class="card-body">
+            <div class="fw-bold mb-2">Date and booking</div>
+
+            @if (Model.Sessions != null && Model.Sessions.Count > 0)
+            {
+                var s = Model.Sessions[0];
+
+                <div class="text-muted">
+                    @s.StartDateTime.ToString("dddd, dd MMM yyyy • HH:mm")
+                    @if (s.EndDateTime.HasValue)
+                    {
+                        <span> - @s.EndDateTime.Value.ToString("HH:mm")</span>
+                    }
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap mt-3">
+                    @if (hasUpcomingSession)
+                    {
+                        @if (Model.IsLoggedIn && Model.IsMember)
+                        {
+                            <a class="btn btn-emerald btn-theme-solid"
+                               asp-controller="Bookings"
+                               asp-action="Create"
+                               asp-route-sessionId="@s.SessionId">
+                                Book Tickets
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-gold-solid btn-theme-solid"
+                               asp-controller="User"
+                               asp-action="Login">
+                                Login to Book
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <span class="badge-soft dark">No upcoming sessions</span>
+                    }
+
+                    <a class="btn btn-ivory btn-theme-solid"
+                       asp-controller="Event"
+                       asp-action="Index">
+                        Back to Events
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="text-muted">Schedule is not available at the moment.</div>
+            }
+        </div>
+    </div>
+
+    <h4 class="mb-3">Reviews</h4>
+
+    @if (!Model.IsMember && !hasFinishedSession)
+    {
+        <div class="alert alert-info">
+            Reviews will appear after the first session of this event has been completed.
+        </div>
+    }
+    else
+    {
+        var reviews = (Model.Reviews ?? new List<EventTicketingSystem.Models.ViewModels.ReviewBlockVM>())
+        .OrderByDescending(r => r.ReviewDate)
+        .ToList();
+
+        if (reviews.Count == 0)
+        {
+            <div class="text-muted mb-2">No reviews yet.</div>
+        }
+        else
+        {
+            <ul class="list-group mb-3">
+                @foreach (var r in reviews.Take(3))
+                {
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <div class="fw-semibold">@r.MemberEmail</div>
+                            <div class="text-muted">@r.ReviewDate.ToString("yyyy-MM-dd")</div>
+                        </div>
+                        <div>Rating: @r.Rating / 5</div>
+                        @if (!string.IsNullOrWhiteSpace(r.Comment))
+                        {
+                            <div class="text-muted">@r.Comment</div>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+
+        <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-ivory btn-theme-solid"
+               asp-controller="Reviews"
+               asp-action="Index"
+               asp-route-eventId="@Model.EventId">
+                View all reviews
+            </a>
+
+            @if (Model.IsLoggedIn && Model.IsMember)
+            {
+                <a class="btn btn-emerald btn-theme-solid"
+                   asp-controller="Reviews"
+                   asp-action="Create"
+                   asp-route-eventId="@Model.EventId">
+                    Write review
+                </a>
+            }
+            else
+            {
+                <a class="btn btn-gold-solid btn-theme-solid"
+                   asp-controller="User"
+                   asp-action="Login">
+                    Login to write review
+                </a>
+            }
+        </div>
+    }
+</div>

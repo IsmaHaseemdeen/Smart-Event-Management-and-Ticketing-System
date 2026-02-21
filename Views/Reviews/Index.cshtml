@@ -1,0 +1,58 @@
+﻿@model List<EventTicketingSystem.Models.Review>
+
+@{
+    ViewData["Title"] = "Reviews";
+    var eventId = (int)(ViewBag.EventId ?? 0);
+}
+
+<h2 class="mb-3">Reviews</h2>
+
+@if (TempData["Err"] != null)
+{
+    <div class="alert alert-warning">@TempData["Err"]</div>
+}
+@if (TempData["Msg"] != null)
+{
+    <div class="alert alert-success">@TempData["Msg"]</div>
+}
+
+<div class="mb-3">
+    <a class="btn btn-outline-secondary btn-sm" asp-controller="Event" asp-action="Details" asp-route-id="@eventId">
+        Back to Event
+    </a>
+
+    @if (Context.Session.GetString("UserRole") == "MEMBER")
+    {
+        <a class="btn btn-primary btn-sm ms-2" asp-action="Create" asp-route-eventId="@eventId">
+            Write a Review
+        </a>
+    }
+</div>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-secondary">No approved reviews yet.</div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var r in Model)
+        {
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="fw-semibold">
+                        @(r.MemberProfile?.FullName ?? ("Member#" + r.MemberProfileId))
+                    </div>
+                    <div class="text-muted small">@r.ReviewDate.ToString("yyyy-MM-dd")</div>
+                </div>
+
+                <div class="mb-1">Rating: <b>@r.Rating</b> / 5</div>
+
+                @if (!string.IsNullOrWhiteSpace(r.Comment))
+                {
+                    <div>@r.Comment</div>
+                }
+            </div>
+        }
+    </div>
+}

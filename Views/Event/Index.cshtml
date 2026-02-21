@@ -1,0 +1,192 @@
+﻿@model EventTicketingSystem.Models.ViewModels.EventSearchVM
+
+@{
+    ViewData["Title"] = "Events";
+}
+
+<h2 class="mb-3">Events</h2>
+
+<form method="get" class="card card-body mb-4">
+    <div class="row g-2 align-items-end">
+
+        <div class="col-md-3">
+            <label class="form-label small text-muted mb-1">Category</label>
+            <select class="form-select" name="categoryId">
+                <option value="">All Categories</option>
+                @foreach (var c in Model.Categories)
+                {
+                    <option value="@c.CategoryId" selected="@(Model.CategoryId == c.CategoryId)">
+                        @c.CategoryName
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label small text-muted mb-1">City</label>
+            <select class="form-select" name="city">
+                <option value="">All Cities</option>
+                @foreach (var ct in Model.Cities)
+                {
+                    <option value="@ct" selected="@(Model.City == ct)">@ct</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label small text-muted mb-1">Venue</label>
+            <select class="form-select" name="venueId">
+                <option value="">All Venues</option>
+                @foreach (var v in Model.Venues)
+                {
+                    <option value="@v.VenueId" selected="@(Model.VenueId == v.VenueId)">
+                        @v.VenueName
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label small text-muted mb-1">Month</label>
+            <input type="month" class="form-control" name="month" value="@Model.Month" />
+        </div>
+
+    </div>
+
+    <div class="mt-3 d-flex gap-2 flex-wrap">
+        <button class="btn btn-primary">Apply</button>
+        <a class="btn btn-outline-secondary" asp-controller="Event" asp-action="Index">Reset</a>
+    </div>
+</form>
+
+@if (Model.Results == null || Model.Results.Count == 0)
+{
+    <div class="alert alert-secondary">No events found.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var e in Model.Results)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 rounded-4">
+                    <div class="card-body p-4">
+
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <h5 class="fw-bold mb-1">@e.Title</h5>
+                            <span class="badge pill pill-status @e.BadgeClass">@e.BadgeLabel</span>
+                        </div>
+
+                        <div class="text-muted mb-2">@e.VenueName, @e.City</div>
+
+                        @if (e.Categories != null && e.Categories.Count > 0)
+                        {
+                            <div class="event-meta mb-3">
+                                @foreach (var cat in e.Categories)
+                                {
+                                    <span class="badge pill pill-category">@cat</span>
+                                }
+                            </div>
+                        }
+
+                        <div class="mb-2">
+                            <div>
+                                <b>Date:</b>
+                                @if (e.UpcomingStart.HasValue)
+                                {
+                                    <span>@e.UpcomingStart.Value.ToString("yyyy-MM-dd HH:mm")</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </div>
+
+                            @if (!e.UpcomingStart.HasValue && e.LastFinishedStart.HasValue)
+                            {
+                                <div class="small text-muted">
+                                    Last held: @e.LastFinishedStart.Value.ToString("yyyy-MM-dd HH:mm")
+                                </div>
+                            }
+
+                            @if (Model.IsMember && e.UpcomingStart.HasValue)
+                            {
+                                <div class="mt-1">
+                                    <b>From:</b> @(e.StartingPrice.HasValue? e.StartingPrice.Value.ToString("0.00") : "N/A")
+                                </div>
+                            }
+                        </div>
+
+                        <div class="event-meta mb-3">
+                            @if (e.UpcomingStart.HasValue)
+                            {
+                                if (e.Availability == "Full")
+                                {
+                                    <span class="badge pill pill-availability is-full">Full</span>
+                                }
+                                else if (e.Availability == "Few Left")
+                                {
+                                    <span class="badge pill pill-availability is-few">Few Left</span>
+                                }
+                                else if (e.Availability == "Available")
+                                {
+                                    <span class="badge pill pill-availability">Available</span>
+                                }
+                                else
+                                {
+                                    <span class="badge pill pill-muted">N/A</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="badge pill pill-muted">No upcoming sessions</span>
+                            }
+
+                            @if (e.HasFinishedSession && e.ReviewCount > 0)
+                            {
+                                <span class="badge pill pill-rating">
+                                    ⭐ @e.AvgRating.ToString("0.0") / 5 (@e.ReviewCount)
+                                </span>
+                            }
+                        </div>
+
+                        @if (e.TopReviews != null && e.TopReviews.Count > 0)
+                        {
+                            <div class="border rounded-3 p-3 bg-light">
+                                <div class="small fw-bold mb-2">Recent reviews</div>
+
+                                @foreach (var r in e.TopReviews.Take(3))
+                                {
+                                    <div class="small mb-2">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="fw-semibold">@r.Name</span>
+                                            <span class="text-muted">@r.ReviewDate.ToString("yyyy-MM-dd")</span>
+                                        </div>
+                                        <div>Rating: @r.Rating / 5</div>
+                                        @if (!string.IsNullOrWhiteSpace(r.Comment))
+                                        {
+                                            <div class="text-muted">
+                                                @(r.Comment!.Length > 90 ? r.Comment.Substring(0, 90) + "..." : r.Comment)
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                    </div>
+
+                    <div class="card-footer bg-white border-0 px-4 pb-4">
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-controller="Event"
+                           asp-action="Details"
+                           asp-route-id="@e.EventId">
+                            View Details
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+}

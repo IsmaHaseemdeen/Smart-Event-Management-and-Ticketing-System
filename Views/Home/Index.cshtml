@@ -1,0 +1,173 @@
+﻿@model EventTicketingSystem.Models.ViewModels.HomeVM
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<section class="hero-image-wrap">
+    <img src="~/images/Hero.png" alt="Metropolitan Cultural Council - City Culture" class="hero-image" />
+</section>
+
+<section class="hero-clean py-5">
+    <div class="container">
+        <div class="hero-card rounded-4 p-5">
+            <h1 class="display-6 fw-bold mb-3 hero-title">Metropolitan Cultural Council</h1>
+
+            <p class="lead mb-3">
+                Welcome to the official platform for city cultural programmes. Discover concerts, theatre, exhibitions,
+                and workshops hosted across leading venues-planned, coordinated, and delivered by the Council.
+            </p>
+
+            <p class="mb-3">
+                Browse upcoming events as a guest to view schedules, venues, and event details. Create a member account
+                to book tickets online, manage your bookings, and receive updates about new sessions and programme releases.
+            </p>
+
+            <p class="mb-0">
+                <a class="link-light text-decoration-underline"
+                   asp-controller="Inquiry" asp-action="Create">
+                    Need assistance? Submit an inquiry and our team will respond
+                </a>
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 align-items-start">
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-3">Council Overview</h2>
+
+                <p class="text-muted">
+                    The Metropolitan Cultural Council is responsible for developing and supporting cultural opportunities
+                    across the city. We collaborate with venues, artists, educators, and community partners to deliver
+                    programmes that are inclusive, well-managed, and accessible to residents and visitors.
+                </p>
+
+                <p class="text-muted mb-0">
+                    This system provides a central place to explore what’s happening, view event information in advance,
+                    and book tickets securely. It also helps the Council improve service quality through feedback and
+                    enquiries—ensuring each event is delivered with clear communication, organised entry, and a consistent
+                    attendee experience.
+                </p>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="border rounded-4 p-4">
+                    <h6 class="fw-bold mb-3">Quick Links</h6>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-outline-success" asp-controller="Event" asp-action="Index">Browse All Events</a>
+                        <a class="btn btn-outline-success" asp-controller="Review" asp-action="Index">Read Reviews</a>
+                        <a class="btn btn-outline-success" asp-controller="Inquiry" asp-action="Create">Submit an Inquiry</a>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="small text-muted">
+                        Tip: Members can view starting prices and book tickets online.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <div>
+                <h3 class="fw-bold mb-1">Upcoming Events</h3>
+                <p class="text-muted mb-0">A selection of the nearest upcoming sessions</p>
+            </div>
+            <a class="btn btn-success" asp-controller="Event" asp-action="Index">View All</a>
+        </div>
+
+        @if (Model.TopEvents == null || Model.TopEvents.Count == 0)
+        {
+            <div class="alert alert-secondary">No upcoming events found.</div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var e in Model.TopEvents)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-0 rounded-4 p-4">
+                            <h5 class="fw-bold mb-2">@e.Title</h5>
+
+                            @if (e.Categories != null && e.Categories.Count > 0)
+                            {
+                                <div class="event-meta mb-2">
+                                    @foreach (var cat in e.Categories)
+                                    {
+                                        <span class="pill pill-category">@cat</span>
+                                    }
+                                </div>
+                            }
+
+                            <div class="text-muted">@e.VenueName, @e.City</div>
+
+                            <div class="mt-2">
+                                <div><b>Date:</b> @(e.NextStart.HasValue? e.NextStart.Value.ToString("yyyy-MM-dd HH:mm") : "N/A")</div>
+
+                                @if (Model.IsMember)
+                                {
+                                    <div><b>From:</b> @(e.StartingPrice.HasValue? e.StartingPrice.Value.ToString("0.00") : "N/A")</div>
+                                }
+                            </div>
+
+                            <div class="event-meta mt-3">
+                                @if (e.Availability == "Full")
+                                {
+                                    <span class="pill pill-availability is-full">Full</span>
+                                }
+                                else if (e.Availability == "Few Left")
+                                {
+                                    <span class="pill pill-availability is-few">Few Left</span>
+                                }
+                                else
+                                {
+                                    <span class="pill pill-availability">Available</span>
+                                }
+                            </div>
+
+                            <div class="mt-4">
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-controller="Event"
+                                   asp-action="Details"
+                                   asp-route-id="@e.EventId">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<style>
+    .hero-image-wrap {
+        width: 100%;
+        background: #111;
+    }
+
+    .hero-image {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .hero-clean {
+        background: #f6f6f4;
+    }
+
+    .hero-card {
+        background: linear-gradient(90deg, #0e3b2f 0%, #145a46 100%);
+        color: #fff;
+        box-shadow: 0 .5rem 1.25rem rgba(0,0,0,.08);
+    }
+</style>

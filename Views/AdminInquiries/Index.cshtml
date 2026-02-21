@@ -1,0 +1,94 @@
+﻿@model List<EventTicketingSystem.Models.Inquiry>
+
+@{
+    ViewData["Title"] = "Inquiries";
+    var filterStatus = (string)(ViewBag.FilterStatus ?? "ALL");
+    var filterType = (string)(ViewBag.FilterType ?? "ALL");
+}
+
+<h2 class="mb-3">Inquiries</h2>
+
+
+<!-- Type Filters -->
+<div class="mb-3 d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-secondary btn-sm"
+       asp-action="Index"
+       asp-route-status="@filterStatus">All Types</a>
+
+    <a class="btn btn-outline-dark btn-sm"
+       asp-action="Index"
+       asp-route-type="GENERAL"
+       asp-route-status="@filterStatus">General</a>
+
+    <a class="btn btn-outline-dark btn-sm"
+       asp-action="Index"
+       asp-route-type="EVENT"
+       asp-route-status="@filterStatus">Event</a>
+
+    <a class="btn btn-outline-dark btn-sm"
+       asp-action="Index"
+       asp-route-type="MEMBERSHIP"
+       asp-route-status="@filterStatus">Membership</a>
+
+    <a class="btn btn-outline-dark btn-sm"
+       asp-action="Index"
+       asp-route-type="TECHNICAL"
+       asp-route-status="@filterStatus">Technical</a>
+</div>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-secondary">No inquiries found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>From</th>
+                    <th>Email</th>
+                    <th>Type</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th style="width:140px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var i in Model)
+                {
+                    var fromName = i.MemberProfile != null ? i.MemberProfile.FullName : "Guest";
+                    var fromType = i.MemberProfileId != null ? "(Member)" : "(Guest)";
+                    var st = (i.Status ?? "").ToUpperInvariant();
+
+                    <tr>
+                        <td>@i.CreatedAt.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <div class="fw-semibold">@fromName</div>
+                            <div class="text-muted small">@fromType</div>
+                        </td>
+                        <td>@(string.IsNullOrWhiteSpace(i.Email) ? "-" : i.Email)</td>
+                        <td>@(string.IsNullOrWhiteSpace(i.InquiryType) ? "-" : i.InquiryType)</td>
+                        <td>@i.Subject</td>
+                        <td>
+                            @if (st == "OPEN")
+                            {
+                                <span class="badge bg-primary">OPEN</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">CLOSED</span>
+                            }
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-dark"
+                               asp-action="Details"
+                               asp-route-id="@i.InquiryId">Open</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

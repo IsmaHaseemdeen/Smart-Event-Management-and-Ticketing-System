@@ -1,0 +1,20 @@
+﻿@model EventTicketingSystem.Models.Event
+@{
+    ViewData["Title"] = "Delete Event";
+}
+
+<h2>Delete Event</h2>
+
+<div class="alert alert-warning">Are you sure you want to delete this event?</div>
+
+<div class="card p-3 mb-3">
+    <div><b>Title:</b> @Model.Title</div>
+    <div><b>Venue:</b> @(Model.Venue?.VenueName ?? "")</div>
+    <div><b>Status:</b> @Model.Status</div>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="EventId" />
+    <button class="btn btn-danger" type="submit">Yes, Delete</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+</form>

@@ -1,0 +1,94 @@
+﻿@model List<EventTicketingSystem.Models.Review>
+
+@{
+    ViewData["Title"] = "Review Moderation";
+    var filter = (string)(ViewBag.Filter ?? "ALL");
+}
+
+<h2 class="mb-3">Review Moderation</h2>
+
+<div class="mb-3 d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-secondary btn-sm" asp-action="Index">All</a>
+    <a class="btn btn-outline-success btn-sm" asp-action="Index" asp-route-status="APPROVED">Approved</a>
+    <a class="btn btn-outline-danger btn-sm" asp-action="Index" asp-route-status="PENDING">Pending</a>
+</div>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-secondary">No reviews found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Member</th>
+                    <th>Event</th>
+                    <th>Rating</th>
+                    <th>Comment</th>
+                    <th>Approved</th>
+                    <th>Approved By</th>
+                    <th style="width:220px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    var approved = string.Equals(r.IsApproved, "Y", StringComparison.OrdinalIgnoreCase);
+
+                    <tr>
+                        <td>@r.ReviewDate.ToString("yyyy-MM-dd")</td>
+                        <td>@(r.MemberProfile?.FullName ?? ("Member#" + r.MemberProfileId))</td>
+                        <td>@(r.Event?.Title ?? ("Event#" + r.EventId))</td>
+                        <td>@r.Rating</td>
+                        <td style="max-width:420px; white-space:normal;">
+                            @(string.IsNullOrWhiteSpace(r.Comment) ? "-" : r.Comment)
+                        </td>
+                        <td>
+                            @if (approved)
+                            {
+                                <span class="badge bg-success">Y</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">N</span>
+                            }
+                        </td>
+                        <td>
+                            @if (approved)
+                            {
+                                <span class="text-muted small">
+                                    @(r.ApprovedByUser?.FullName ?? ("User#" + r.IsApprovedBy))
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (!approved)
+                            {
+                                <form asp-action="Approve" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="reviewId" value="@r.ReviewId" />
+                                    <button class="btn btn-sm btn-outline-success">Approve</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="Unapprove" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="reviewId" value="@r.ReviewId" />
+                                    <button class="btn btn-sm btn-outline-danger">Unapprove</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

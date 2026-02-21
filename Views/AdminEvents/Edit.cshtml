@@ -1,0 +1,89 @@
+﻿@model EventTicketingSystem.Models.Event
+@using EventTicketingSystem.Models
+
+@{
+    ViewData["Title"] = "Edit Event";
+    var allCats = ViewBag.AllCategories as List<Category> ?? new List<Category>();
+    var selected = ViewBag.SelectedCategoryIds as HashSet<int> ?? new HashSet<int>();
+}
+
+<h2>Edit Event</h2>
+
+<form asp-action="Edit" method="post" class="card p-3">
+    <input type="hidden" asp-for="EventId" />
+    <input type="hidden" asp-for="CreatedAt" />
+    <input type="hidden" asp-for="CreatedBy" />
+
+    <div class="mb-3">
+        <label class="form-label">Venue</label>
+        <select class="form-select" asp-for="VenueId" asp-items="ViewBag.VenueId"></select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Title</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Poster URL</label>
+        <input asp-for="PosterUrl" class="form-control" />
+    </div>
+
+    <!-- Categories -->
+    <div class="mb-3">
+        <label class="form-label d-block">Categories</label>
+
+        @if (allCats.Count == 0)
+        {
+            <div class="text-muted">No categories found.</div>
+        }
+        else
+        {
+            <div class="row g-2">
+                @foreach (var c in allCats)
+                {
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="categoryIds"
+                                   value="@c.CategoryId"
+                                   checked="@(selected.Contains(c.CategoryId))" />
+                            <label class="form-check-label">@c.CategoryName</label>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (ViewData.ModelState.ContainsKey("Categories"))
+        {
+            foreach (var err in ViewData.ModelState["Categories"]!.Errors)
+            {
+                <div class="text-danger mt-1">@err.ErrorMessage</div>
+            }
+        }
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Status</label>
+        <select asp-for="Status" class="form-select">
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="FINISHED">FINISHED</option>
+            <option value="CANCELLED">CANCELLED</option>
+        </select>
+    </div>
+
+    <button class="btn btn-success" type="submit">Update</button>
+    <a class="btn btn-secondary" asp-action="Index">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

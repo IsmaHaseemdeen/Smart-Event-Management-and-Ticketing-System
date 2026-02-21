@@ -1,0 +1,101 @@
+﻿@model List<EventTicketingSystem.Models.Booking>
+@{
+    ViewData["Title"] = "My Bookings";
+}
+
+<h2 class="mb-3">My Bookings</h2>
+
+@if (TempData["Msg"] != null)
+{
+    <div class="alert alert-success">@TempData["Msg"]</div>
+}
+@if (TempData["Err"] != null)
+{
+    <div class="alert alert-danger">@TempData["Err"]</div>
+}
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-secondary">No bookings yet.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th class="text-end">Total</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Used</th>
+                    <th class="text-end"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var b in Model)
+                {
+                    var status = (b.BookingStatus ?? "").ToUpperInvariant();
+                    var pay = (b.Payment?.PaymentStatus ?? "").ToUpperInvariant();
+                    var used = (b.IsUsed ?? "N").ToUpperInvariant();
+
+                    <tr>
+                        <td>@b.BookingCode</td>
+                        <td>@b.Session?.Event?.Title</td>
+                        <td>@(b.Session != null ? b.Session.StartDatetime.ToString("yyyy-MM-dd HH:mm") : "-")</td>
+                        <td class="text-end">@b.TotalAmount.ToString("0.00")</td>
+
+                        <td>
+                            @if (status == "CONFIRMED")
+                            {
+                                <span class="badge bg-success">CONFIRMED</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">PENDING</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (pay == "SUCCESS")
+                            {
+                                <span class="badge bg-primary">SUCCESS</span>
+                            }
+                            else if (pay == "FAILED")
+                            {
+                                <span class="badge bg-danger">FAILED</span>
+                            }
+                            else if (string.IsNullOrWhiteSpace(pay))
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">PENDING</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (used == "Y")
+                            {
+                                <span class="badge bg-success">Y</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">N</span>
+                            }
+                        </td>
+
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary"
+                               asp-action="Details"
+                               asp-route-id="@b.BookingId">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,74 @@
+﻿@model EventTicketingSystem.Models.Inquiry
+
+@{
+    ViewData["Title"] = "Inquiry Details";
+}
+
+<h2 class="mb-3">Inquiry Details</h2>
+
+<div class="mb-3">
+    <a class="btn btn-sm btn-outline-secondary" asp-action="My">Back</a>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row g-2">
+            <div class="col-md-6">
+                <div class="text-muted small">Created</div>
+                <div class="fw-semibold">
+                    @Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="text-muted small">Status</div>
+                <div class="fw-semibold">@Model.Status</div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="mb-2">
+            <div class="text-muted small">Type</div>
+            <div class="fw-semibold">@Model.InquiryType</div>
+        </div>
+
+        <div class="mb-2">
+            <div class="text-muted small">Subject</div>
+            <div class="fw-semibold">@Model.Subject</div>
+        </div>
+
+        <div class="mb-2">
+            <div class="text-muted small">Message</div>
+            <div class="border rounded p-2 bg-light">
+                @Model.Message
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="mb-3">Admin Reply</h5>
+
+        @if (string.IsNullOrWhiteSpace(Model.Reply))
+        {
+            <div class="alert alert-secondary mb-0">
+                No reply yet. Please check again later.
+            </div>
+        }
+        else
+        {
+            <div class="border rounded p-3 bg-light">
+                @Model.Reply
+            </div>
+
+            @if (Model.RepliedAt != null)
+            {
+                <div class="text-muted small mt-2">
+                    Replied at:
+                    @Model.RepliedAt.Value.ToString("yyyy-MM-dd HH:mm")
+                </div>
+            }
+        }
+    </div>
+</div>

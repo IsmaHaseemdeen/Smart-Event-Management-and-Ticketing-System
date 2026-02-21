@@ -1,0 +1,42 @@
+﻿@model EventTicketingSystem.Models.TicketType
+@{
+    ViewData["Title"] = "Add Ticket Type";
+    var sessionId = (int)ViewBag.SessionId;
+}
+
+<h2 class="mb-2">Add Ticket Type</h2>
+<div class="text-muted mb-3">@ViewBag.EventTitle | Session: @ViewBag.SessionStart</div>
+
+<form asp-action="Create" method="post" class="card p-3 shadow-sm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="SessionId" value="@sessionId" />
+
+    <div class="mb-3">
+        <label class="form-label">Type Name</label>
+        <input asp-for="TypeName" class="form-control" />
+        <span asp-validation-for="TypeName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Price</label>
+        <input asp-for="Price" class="form-control" />
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Status</label>
+        <select asp-for="Status" class="form-select">
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="CANCELLED">CANCELLED</option>
+            <option value="FINISHED">FINISHED</option>
+        </select>
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-success" type="submit">Save</button>
+    <a class="btn btn-outline-secondary ms-2" asp-action="Index" asp-route-sessionId="@sessionId">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

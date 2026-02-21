@@ -1,0 +1,41 @@
+﻿@model List<EventTicketingSystem.Models.EventSession>
+@{
+    ViewData["Title"] = "Choose a Session";
+}
+
+<h2 class="mb-3">Choose a Session</h2>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-secondary">No sessions found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Session</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th class="text-end"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model)
+                {
+                    <tr>
+                        <td>@s.SessionId</td>
+                        <td>@s.StartDatetime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@s.SessionStatus</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-success"
+                               asp-action="Create"
+                               asp-route-sessionId="@s.SessionId">Book</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

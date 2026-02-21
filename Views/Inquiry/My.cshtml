@@ -1,0 +1,71 @@
+﻿@model List<EventTicketingSystem.Models.Inquiry>
+
+@{
+    ViewData["Title"] = "My Inquiries";
+    var filter = (string)(ViewBag.Filter ?? "ALL");
+}
+
+<h2 class="mb-3">My Inquiries</h2>
+
+<div class="mb-3 d-flex gap-2 flex-wrap">
+    <a class="btn btn-outline-secondary btn-sm"
+       asp-action="My"
+       asp-route-status="ALL">All</a>
+
+    <a class="btn btn-outline-primary btn-sm"
+       asp-action="My"
+       asp-route-status="OPEN">Open</a>
+
+    <a class="btn btn-outline-success btn-sm"
+       asp-action="My"
+       asp-route-status="CLOSED">Closed</a>
+
+    <a class="btn btn-sm btn-primary ms-auto"
+       asp-action="Create">+ New Inquiry</a>
+</div>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-secondary">No inquiries found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th style="width:140px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var i in Model)
+                {
+                    <tr>
+                        <td>@i.CreatedAt.ToString("yyyy-MM-dd")</td>
+                        <td>@(string.IsNullOrWhiteSpace(i.InquiryType) ? "-" : i.InquiryType)</td>
+                        <td>@i.Subject</td>
+                        <td>
+                            @if (string.Equals(i.Status, "OPEN", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-primary">OPEN</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">CLOSED</span>
+                            }
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-dark"
+                               asp-action="Details"
+                               asp-route-id="@i.InquiryId">Open</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
