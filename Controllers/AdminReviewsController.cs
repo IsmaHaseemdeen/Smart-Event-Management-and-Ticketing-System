@@ -36,7 +36,8 @@ namespace EventTicketingSystem.Controllers
 
             var q = _context.Reviews
                 .Include(r => r.Event)
-                .Include(r => r.MemberProfile)
+                .Include(r => r.User)              // review owner
+                .Include(r => r.ApprovedByUser)    // admin who approved 
                 .AsQueryable();
 
             if (status == "APPROVED")
@@ -62,9 +63,29 @@ namespace EventTicketingSystem.Controllers
             if (!adminUserId.HasValue) return RedirectToLogin();
 
             r.IsApproved = "Y";
-            r.IsApprovedBy = adminUserId.Value;
+            r.IsApprovedBy = adminUserId.Value; 
 
             _context.SaveChanges();
+
+            TempData["Msg"] = "Review approved.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Unapprove(int reviewId)
+        {
+            if (!IsAdmin()) return RedirectToLogin();
+
+            var r = _context.Reviews.FirstOrDefault(x => x.ReviewId == reviewId);
+            if (r == null) return NotFound();
+
+            r.IsApproved = "N";
+            r.IsApprovedBy = null; 
+
+            _context.SaveChanges();
+
+            TempData["Msg"] = "Review moved back to pending.";
             return RedirectToAction(nameof(Index));
         }
     }

@@ -32,19 +32,24 @@ namespace EventTicketingSystem.Controllers
         {
             if (!IsAdmin()) return RedirectToLogin();
 
+            status = (status ?? "ALL").Trim().ToUpperInvariant();
+            type = (type ?? "ALL").Trim().ToUpperInvariant();
+
             var q = _context.Inquiries
-                .Include(i => i.MemberProfile)
+                .Include(i => i.User) 
                 .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(type))
-            {
-                type = type.ToUpper();
-                var allowed = new[] { "GENERAL", "EVENT", "MEMBERSHIP", "TECHNICAL" };
-                if (allowed.Contains(type))
-                    q = q.Where(i => i.InquiryType == type);
-            }
+
+            // Filter by type
+            var allowedTypes = new[] { "GENERAL", "EVENT", "MEMBERSHIP", "TECHNICAL" };
+            if (allowedTypes.Contains(type))
+                q = q.Where(i => i.InquiryType == type);
 
             var list = q.OrderByDescending(i => i.CreatedAt).ToList();
+
+            ViewBag.FilterStatus = status;
+            ViewBag.FilterType = type;
+
             return View(list);
         }
 
@@ -53,7 +58,7 @@ namespace EventTicketingSystem.Controllers
             if (!IsAdmin()) return RedirectToLogin();
 
             var inquiry = _context.Inquiries
-                .Include(i => i.MemberProfile)
+                .Include(i => i.User) 
                 .FirstOrDefault(i => i.InquiryId == id);
 
             if (inquiry == null) return NotFound();
@@ -66,8 +71,14 @@ namespace EventTicketingSystem.Controllers
         {
             if (!IsAdmin()) return RedirectToLogin();
 
+            status = (status ?? "").Trim().ToUpperInvariant();
+            if (status != "OPEN" && status != "CLOSED")
+                status = "OPEN";
+
             var inquiry = _context.Inquiries.FirstOrDefault(i => i.InquiryId == inquiryId);
             if (inquiry == null) return NotFound();
+
+            inquiry.Status = status;
 
             if (!string.IsNullOrWhiteSpace(reply))
             {

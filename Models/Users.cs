@@ -38,7 +38,6 @@ namespace EventTicketingSystem.Models
 
         // Navigation
 
-        public MemberProfile? MemberProfile { get; set; }
 
         public ICollection<Event> CreatedEvents { get; set; } = new List<Event>();
 

@@ -18,6 +18,5 @@ namespace EventTicketingSystem.Models
         // navigation
         public ICollection<EventCategory> EventCategories { get; set; } = new List<EventCategory>();
 
-        public ICollection<MemberPreference> MemberPreferences { get; set; } = new List<MemberPreference>();
     }
 }

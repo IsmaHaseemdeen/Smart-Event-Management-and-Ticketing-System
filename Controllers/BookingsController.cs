@@ -39,13 +39,10 @@ namespace EventTicketingSystem.Controllers
             var userId = CurrentUserId();
             if (userId == null) return RedirectToLogin();
 
-            var profile = _context.MemberProfiles.FirstOrDefault(m => m.UserId == userId.Value);
-            if (profile == null) return RedirectToLogin();
-
             var list = _context.Bookings
                 .Include(b => b.Session).ThenInclude(s => s.Event)
                 .Include(b => b.Payment)
-                .Where(b => b.MemberProfileId == profile.MemberProfileId)
+                .Where(b => b.UserId == userId.Value) // ✅ changed
                 .OrderByDescending(b => b.BookingDate)
                 .ToList();
 
@@ -82,9 +79,7 @@ namespace EventTicketingSystem.Controllers
                     TicketTypeId = t.TicketTypeId,
                     TypeName = t.TypeName,
                     Price = t.Price,
-
                     Remaining = remainingSession,
-
                     Qty = 0
                 }).ToList()
             };
@@ -101,14 +96,10 @@ namespace EventTicketingSystem.Controllers
             var userId = CurrentUserId();
             if (userId == null) return RedirectToLogin();
 
-            var profile = _context.MemberProfiles.FirstOrDefault(m => m.UserId == userId.Value);
-            if (profile == null) return RedirectToLogin();
-
             using var tx = _context.Database.BeginTransaction(IsolationLevel.Serializable);
 
             try
             {
-              
                 var session = _context.EventSessions
                     .FirstOrDefault(s => s.SessionId == vm.SessionId && s.SessionStatus == "ACTIVE");
 
@@ -148,7 +139,7 @@ namespace EventTicketingSystem.Controllers
 
                 var booking = new Booking
                 {
-                    MemberProfileId = profile.MemberProfileId,
+                    UserId = userId.Value, 
                     SessionId = vm.SessionId,
                     BookingCode = bookingCode,
                     BookingDate = now,
@@ -217,11 +208,14 @@ namespace EventTicketingSystem.Controllers
         {
             if (!IsLoggedIn() || !IsMember()) return RedirectToLogin();
 
+            var userId = CurrentUserId();
+            if (userId == null) return RedirectToLogin();
+
             var booking = _context.Bookings
                 .Include(b => b.Session).ThenInclude(s => s.Event).ThenInclude(e => e.Venue)
                 .Include(b => b.BookedTickets).ThenInclude(bt => bt.TicketType)
                 .Include(b => b.Payment)
-                .FirstOrDefault(b => b.BookingId == id);
+                .FirstOrDefault(b => b.BookingId == id && b.UserId == userId.Value); 
 
             if (booking == null) return NotFound();
 
@@ -234,6 +228,15 @@ namespace EventTicketingSystem.Controllers
         {
             if (!IsLoggedIn() || !IsMember()) return RedirectToLogin();
 
+            var userId = CurrentUserId();
+            if (userId == null) return RedirectToLogin();
+
+            if (string.IsNullOrWhiteSpace(method))
+            {
+                TempData["Err"] = "Please select a payment method.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
             using var tx = _context.Database.BeginTransaction(IsolationLevel.Serializable);
 
             try
@@ -242,7 +245,7 @@ namespace EventTicketingSystem.Controllers
                     .Include(b => b.Payment)
                     .Include(b => b.BookedTickets)
                     .Include(b => b.Session)
-                    .FirstOrDefault(b => b.BookingId == id);
+                    .FirstOrDefault(b => b.BookingId == id && b.UserId == userId.Value); 
 
                 if (booking == null) return NotFound();
                 if (booking.Payment == null) return BadRequest("Payment record missing.");
@@ -255,7 +258,7 @@ namespace EventTicketingSystem.Controllers
                 }
 
                 booking.Payment.PaymentStatus = "SUCCESS";
-                booking.Payment.Method = string.IsNullOrWhiteSpace(method) ? "CARD" : method;
+                booking.Payment.Method = method;
                 booking.Payment.PaidAt = DateTime.Now;
 
                 var totalQty = booking.BookedTickets.Sum(x => x.Quantity);
@@ -286,7 +289,7 @@ namespace EventTicketingSystem.Controllers
 
         private int GetRemainingForSession(EventSession session)
         {
-            if (session.TotalSeats <= 0) return 0; // not configured -> treat as no seats
+            if (session.TotalSeats <= 0) return 0;
             var remaining = session.TotalSeats - (session.ReservedSeats + session.SoldSeats);
             return remaining < 0 ? 0 : remaining;
         }

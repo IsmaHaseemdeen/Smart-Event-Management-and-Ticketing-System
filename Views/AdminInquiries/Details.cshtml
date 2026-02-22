@@ -12,10 +12,10 @@
             <div class="col-md-6">
                 <div class="text-muted small">From</div>
                 <div class="fw-semibold">
-                    @(Model.MemberProfile != null ? Model.MemberProfile.FullName : "Guest")
+                    @(Model.User != null ? Model.User.FullName : "Guest")
                 </div>
                 <div class="text-muted">
-                    @(Model.MemberProfileId != null ? "Member" : "Guest")
+                    @(Model.UserId != null ? "Member" : "Guest")
                     @if (!string.IsNullOrWhiteSpace(Model.Email))
                     {
                         <span> • @Model.Email</span>
@@ -59,7 +59,7 @@
     <div class="card-body">
         <h5 class="mb-3">Admin Reply / Status</h5>
 
-        <form asp-action="Update" method="post">
+        <form asp-action="Update" method="post" id="replyForm">
             @Html.AntiForgeryToken()
             <input type="hidden" name="inquiryId" value="@Model.InquiryId" />
 
@@ -74,6 +74,7 @@
             <div class="mb-3">
                 <label class="form-label">Reply (optional)</label>
                 <textarea class="form-control" name="reply" rows="4">@Model.Reply</textarea>
+                <div class="form-text">Tip: If you add a reply, consider closing the inquiry.</div>
             </div>
 
             <button class="btn btn-primary">Save</button>
@@ -88,3 +89,20 @@
         }
     </div>
 </div>
+
+<script>
+    // Optional "confirm close"
+    (function () {
+      const f = document.getElementById("replyForm");
+      if (!f) return;
+
+      f.addEventListener("submit", function (e) {
+        const status = f.querySelector('select[name="status"]')?.value;
+        if (status === "CLOSED") {
+          if (!confirm("Mark this inquiry as CLOSED?")) {
+            e.preventDefault();
+          }
+        }
+      });
+    })();
+</script>

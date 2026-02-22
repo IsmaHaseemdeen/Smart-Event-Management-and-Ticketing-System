@@ -2,7 +2,6 @@
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using EventTicketingSystem.Data;
 using EventTicketingSystem.Models;
 
@@ -35,6 +34,15 @@ namespace EventTicketingSystem.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            if (IsMember())
+            {
+                var uid = UserId();
+                if (uid.HasValue)
+                {
+                    var u = _context.Users.FirstOrDefault(x => x.UserId == uid.Value);
+                    ViewBag.Email = u?.Email ?? "";
+                }
+            }
             return View();
         }
 
@@ -60,22 +68,23 @@ namespace EventTicketingSystem.Controllers
             if (!allowedTypes.Contains(inquiryType))
                 inquiryType = "GENERAL";
 
-            int? memberProfileId = null;
+            int? userId = null;
 
+            
             if (IsMember())
             {
-                var userId = UserId();
-                if (userId.HasValue)
+                var uid = UserId();
+                if (uid.HasValue)
                 {
-                    var mp = _context.MemberProfiles.FirstOrDefault(x => x.UserId == userId.Value);
-                    if (mp != null) memberProfileId = mp.MemberProfileId;
+                    userId = uid.Value;
 
-                    var user = _context.Users.FirstOrDefault(u => u.UserId == userId.Value);
+                    var user = _context.Users.FirstOrDefault(u => u.UserId == uid.Value);
                     if (user != null && !string.IsNullOrWhiteSpace(user.Email))
                         email = user.Email.Trim();
                 }
             }
 
+            
             var adminId = _context.Users
                 .Where(u => u.Role == "ADMIN" && u.Status == "ACTIVE")
                 .OrderBy(u => u.UserId)
@@ -98,7 +107,7 @@ namespace EventTicketingSystem.Controllers
 
             var inquiry = new Inquiry
             {
-                MemberProfileId = memberProfileId,
+                UserId = userId, 
                 InquiryType = inquiryType,
                 Email = email,
                 Subject = subject,
@@ -113,6 +122,7 @@ namespace EventTicketingSystem.Controllers
             _context.Inquiries.Add(inquiry);
             _context.SaveChanges();
 
+            TempData["Msg"] = "Inquiry submitted successfully.";
             return RedirectToAction(nameof(Success));
         }
 
@@ -121,16 +131,13 @@ namespace EventTicketingSystem.Controllers
         {
             if (!IsMember()) return RedirectToLogin();
 
-            var userId = UserId();
-            if (userId == null) return RedirectToLogin();
-
-            var profile = _context.MemberProfiles.FirstOrDefault(p => p.UserId == userId.Value);
-            if (profile == null) return RedirectToAction("Profile", "Member");
+            var uid = UserId();
+            if (!uid.HasValue) return RedirectToLogin();
 
             status = (status ?? "ALL").Trim().ToUpperInvariant();
             if (status != "OPEN" && status != "CLOSED") status = "ALL";
 
-            var q = _context.Inquiries.Where(i => i.MemberProfileId == profile.MemberProfileId);
+            var q = _context.Inquiries.Where(i => i.UserId == uid.Value);
 
             if (status != "ALL")
                 q = q.Where(i => i.Status == status);
@@ -146,14 +153,11 @@ namespace EventTicketingSystem.Controllers
         {
             if (!IsMember()) return RedirectToLogin();
 
-            var userId = UserId();
-            if (userId == null) return RedirectToLogin();
-
-            var profile = _context.MemberProfiles.FirstOrDefault(p => p.UserId == userId.Value);
-            if (profile == null) return RedirectToAction("Profile", "Member");
+            var uid = UserId();
+            if (!uid.HasValue) return RedirectToLogin();
 
             var inquiry = _context.Inquiries
-                .FirstOrDefault(i => i.InquiryId == id && i.MemberProfileId == profile.MemberProfileId);
+                .FirstOrDefault(i => i.InquiryId == id && i.UserId == uid.Value);
 
             if (inquiry == null) return NotFound();
 

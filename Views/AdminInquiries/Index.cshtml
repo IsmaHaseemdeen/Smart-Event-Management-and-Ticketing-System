@@ -8,12 +8,11 @@
 
 <h2 class="mb-3">Inquiries</h2>
 
-
-<!-- Type Filters -->
 <div class="mb-3 d-flex flex-wrap gap-2">
     <a class="btn btn-outline-secondary btn-sm"
        asp-action="Index"
-       asp-route-status="@filterStatus">All Types</a>
+       asp-route-status="@filterStatus"
+       asp-route-type="ALL">All Types</a>
 
     <a class="btn btn-outline-dark btn-sm"
        asp-action="Index"
@@ -34,6 +33,23 @@
        asp-action="Index"
        asp-route-type="TECHNICAL"
        asp-route-status="@filterStatus">Technical</a>
+</div>
+
+<div class="mb-3 d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-secondary btn-sm"
+       asp-action="Index"
+       asp-route-type="@filterType"
+       asp-route-status="ALL">All Status</a>
+
+    <a class="btn btn-outline-primary btn-sm"
+       asp-action="Index"
+       asp-route-type="@filterType"
+       asp-route-status="OPEN">Open</a>
+
+    <a class="btn btn-outline-success btn-sm"
+       asp-action="Index"
+       asp-route-type="@filterType"
+       asp-route-status="CLOSED">Closed</a>
 </div>
 
 @if (Model == null || Model.Count == 0)
@@ -58,8 +74,8 @@ else
             <tbody>
                 @foreach (var i in Model)
                 {
-                    var fromName = i.MemberProfile != null ? i.MemberProfile.FullName : "Guest";
-                    var fromType = i.MemberProfileId != null ? "(Member)" : "(Guest)";
+                    var fromName = i.User != null ? i.User.FullName : "Guest";
+                    var fromType = i.UserId != null ? "(Member)" : "(Guest)";
                     var st = (i.Status ?? "").ToUpperInvariant();
 
                     <tr>

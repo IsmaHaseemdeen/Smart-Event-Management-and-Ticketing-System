@@ -41,14 +41,12 @@ namespace EventTicketingSystem.Controllers
                 }
             }
 
-     
             var eventsQ = _context.Events
                 .Include(e => e.Venue)
                 .Include(e => e.EventCategories).ThenInclude(ec => ec.Category)
                 .AsNoTracking()
                 .Where(e => e.Status == "ACTIVE" || e.Status == "FINISHED");
 
-  
             if (!string.IsNullOrWhiteSpace(city))
                 eventsQ = eventsQ.Where(e => e.Venue != null && e.Venue.City == city);
 
@@ -60,7 +58,6 @@ namespace EventTicketingSystem.Controllers
 
             var events = await eventsQ.ToListAsync();
 
-            
             var sessions = await _context.EventSessions
                 .AsNoTracking()
                 .Where(s =>
@@ -68,7 +65,6 @@ namespace EventTicketingSystem.Controllers
                     s.SessionStatus == "FINISHED")
                 .ToListAsync();
 
-            
             if (filterYear.HasValue && filterMonth.HasValue)
             {
                 events = events
@@ -85,8 +81,9 @@ namespace EventTicketingSystem.Controllers
                 .Where(t => t.Status == "ACTIVE")
                 .ToListAsync();
 
+            
             var approvedReviews = await _context.Reviews
-                .Include(r => r.MemberProfile)
+                .Include(r => r.User)
                 .AsNoTracking()
                 .Where(r => r.IsApproved == "Y" && events.Select(e => e.EventId).Contains(r.EventId))
                 .OrderByDescending(r => r.ReviewDate)
@@ -102,7 +99,7 @@ namespace EventTicketingSystem.Controllers
                         Avg = g.Average(x => (double)x.Rating),
                         Top = g.Take(3).Select(x => new MiniReviewVM
                         {
-                            Name = x.MemberProfile?.FullName ?? ("Member#" + x.MemberProfileId),
+                            Name = x.User?.FullName ?? ("User#" + x.UserId),
                             Rating = x.Rating,
                             Comment = x.Comment,
                             ReviewDate = x.ReviewDate
@@ -129,7 +126,6 @@ namespace EventTicketingSystem.Controllers
                 var hasUpcoming = upcoming != null;
                 var hasFinished = lastFinished != null;
 
-                // Categories
                 var cats = e.EventCategories
                     .Where(x => x.Category != null)
                     .Select(x => x.Category!.CategoryName)
@@ -137,7 +133,6 @@ namespace EventTicketingSystem.Controllers
                     .OrderBy(x => x)
                     .ToList();
 
-                // Reviews
                 double avg = 0;
                 int count = 0;
                 var top = new List<MiniReviewVM>();
@@ -148,18 +143,15 @@ namespace EventTicketingSystem.Controllers
                     top = ra.Top;
                 }
 
-                // Pricing + availability based 
                 decimal? startingPrice = null;
                 string availability = "N/A";
 
                 if (upcoming != null)
                 {
                     var types = ticketTypes.Where(t => t.SessionId == upcoming.SessionId).ToList();
-
                     if (types.Any() && IsMember())
                         startingPrice = types.Min(t => t.Price);
 
-                   
                     if (upcoming.TotalSeats > 0)
                     {
                         var remaining = upcoming.TotalSeats - (upcoming.ReservedSeats + upcoming.SoldSeats);
@@ -169,14 +161,9 @@ namespace EventTicketingSystem.Controllers
                         else if (((decimal)remaining / upcoming.TotalSeats) <= 0.20m) availability = "Few Left";
                         else availability = "Available";
                     }
-                    else
-                    {
-                        // not configured
-                        availability = "N/A";
-                    }
+                    else availability = "N/A";
                 }
 
-                // Badge
                 string badgeLabel, badgeClass;
                 if (!hasUpcoming && hasFinished)
                 {
@@ -200,20 +187,14 @@ namespace EventTicketingSystem.Controllers
                     Title = e.Title,
                     VenueName = e.Venue?.VenueName ?? "",
                     City = e.Venue?.City ?? "",
-
                     UpcomingStart = upcoming?.StartDatetime,
-
                     LastFinishedStart = lastFinished?.StartDatetime,
                     HasFinishedSession = hasFinished,
-
                     StartingPrice = startingPrice,
                     Availability = availability,
-
                     Categories = cats,
-
                     BadgeLabel = badgeLabel,
                     BadgeClass = badgeClass,
-
                     AvgRating = avg,
                     ReviewCount = count,
                     TopReviews = hasFinished ? top : new List<MiniReviewVM>()
@@ -269,11 +250,10 @@ namespace EventTicketingSystem.Controllers
                 .FirstOrDefaultAsync();
 
             var displaySession = upcoming ?? lastFinished;
-
             var hasFinishedSession = (lastFinished != null);
 
             var reviews = await _context.Reviews
-                .Include(r => r.MemberProfile)
+                .Include(r => r.User) 
                 .AsNoTracking()
                 .Where(r => r.EventId == id && r.IsApproved == "Y")
                 .OrderByDescending(r => r.ReviewDate)
@@ -311,7 +291,7 @@ namespace EventTicketingSystem.Controllers
                 {
                     vm.Reviews.Add(new ReviewBlockVM
                     {
-                        MemberEmail = r.MemberProfile?.FullName ?? ("Member#" + r.MemberProfileId),
+                        MemberEmail = r.User?.FullName ?? ("User#" + r.UserId),
                         Rating = r.Rating,
                         Comment = r.Comment,
                         ReviewDate = r.ReviewDate

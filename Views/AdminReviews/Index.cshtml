@@ -40,7 +40,7 @@ else
 
                     <tr>
                         <td>@r.ReviewDate.ToString("yyyy-MM-dd")</td>
-                        <td>@(r.MemberProfile?.FullName ?? ("Member#" + r.MemberProfileId))</td>
+                        <td>@(r.User?.FullName ?? ("User#" + r.UserId))</td>
                         <td>@(r.Event?.Title ?? ("Event#" + r.EventId))</td>
                         <td>@r.Rating</td>
                         <td style="max-width:420px; white-space:normal;">
@@ -71,7 +71,7 @@ else
                         <td class="text-end">
                             @if (!approved)
                             {
-                                <form asp-action="Approve" method="post" class="d-inline">
+                                <form asp-action="Approve" method="post" class="d-inline" onsubmit="return confirm('Approve this review?');">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="reviewId" value="@r.ReviewId" />
                                     <button class="btn btn-sm btn-outline-success">Approve</button>
@@ -79,7 +79,8 @@ else
                             }
                             else
                             {
-                                <form asp-action="Unapprove" method="post" class="d-inline">
+                                <!-- Only keep this if you add Unapprove action in controller -->
+                                <form asp-action="Unapprove" method="post" class="d-inline" onsubmit="return confirm('Unapprove this review?');">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="reviewId" value="@r.ReviewId" />
                                     <button class="btn btn-sm btn-outline-danger">Unapprove</button>

@@ -39,13 +39,11 @@
                 </div>
 
                 <div class="col-md-6">
+                   
                     <div class="d-flex flex-wrap gap-2 justify-content-md-end">
                         <span class="ticket-chip ticket-standard">Standard</span>
-                        <span class="ticket-chip ticket-plus">Standard Plus</span>
-                        <span class="ticket-chip ticket-vip-gold">VIP Gold</span>
-                        <span class="ticket-chip ticket-vip-platinum">VIP Platinum</span>
-                        <span class="ticket-chip ticket-balcony-front">Balcony Front</span>
-                        <span class="ticket-chip ticket-balcony-rear">Balcony Rear</span>
+                        <span class="ticket-chip ticket-balcony">Balcony</span>
+                        <span class="ticket-chip ticket-vip">VIP</span>
                     </div>
                 </div>
             </div>
@@ -63,13 +61,10 @@
                     <tbody>
                         @for (int i = 0; i < (Model.Tickets?.Count ?? 0); i++)
                         {
-                            var name = Model.Tickets[i].TypeName?.ToLower() ?? "";
+                            var name = (Model.Tickets[i].TypeName ?? "").ToLower();
                             var cls =
-                            name.Contains("vip") && name.Contains("gold") ? "ticket-vip-gold" :
-                            name.Contains("vip") && name.Contains("platinum") ? "ticket-vip-platinum" :
-                            name.Contains("balcony") && name.Contains("front") ? "ticket-balcony-front" :
-                            name.Contains("balcony") && name.Contains("rear") ? "ticket-balcony-rear" :
-                            name.Contains("plus") ? "ticket-plus" :
+                            name.Contains("vip") ? "ticket-vip" :
+                            name.Contains("balcony") ? "ticket-balcony" :
                                             "ticket-standard";
 
                             <tr>

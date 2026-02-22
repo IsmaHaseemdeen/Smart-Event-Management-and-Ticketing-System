@@ -1,5 +1,8 @@
 ﻿@model List<EventTicketingSystem.Models.Review>
 
+@using System
+@using System.Linq
+
 @{
     ViewData["Title"] = "Reviews";
     var eventId = (int)(ViewBag.EventId ?? 0);
@@ -17,13 +20,19 @@
 }
 
 <div class="mb-3">
-    <a class="btn btn-outline-secondary btn-sm" asp-controller="Event" asp-action="Details" asp-route-id="@eventId">
+    <a class="btn btn-outline-secondary btn-sm"
+       asp-controller="Event"
+       asp-action="Details"
+       asp-route-id="@eventId">
         Back to Event
     </a>
 
-    @if (Context.Session.GetString("UserRole") == "MEMBER")
+    @if (string.Equals(Context.Session.GetString("UserRole"), "MEMBER", StringComparison.OrdinalIgnoreCase))
     {
-        <a class="btn btn-primary btn-sm ms-2" asp-action="Create" asp-route-eventId="@eventId">
+        <a id="btnWriteReview"
+           class="btn btn-primary btn-sm ms-2"
+           asp-action="Create"
+           asp-route-eventId="@eventId">
             Write a Review
         </a>
     }
@@ -38,21 +47,50 @@ else
     <div class="list-group">
         @foreach (var r in Model)
         {
+            var name = r.User?.FullName ?? ("Member#" + r.UserId);
+            var rating = r.Rating;
+
+            // star display
+            var safeRating = Math.Clamp(rating, 0, 5);
+            var filled = new string('★', safeRating);
+            var empty = new string('☆', 5 - safeRating);
+
             <div class="list-group-item">
                 <div class="d-flex justify-content-between align-items-start">
-                    <div class="fw-semibold">
-                        @(r.MemberProfile?.FullName ?? ("Member#" + r.MemberProfileId))
+                    <div>
+                        <div class="fw-semibold">@name</div>
+                        <div class="text-muted small">@r.ReviewDate.ToString("yyyy-MM-dd")</div>
                     </div>
-                    <div class="text-muted small">@r.ReviewDate.ToString("yyyy-MM-dd")</div>
-                </div>
 
-                <div class="mb-1">Rating: <b>@r.Rating</b> / 5</div>
+                    <div class="text-end">
+                        <div class="fs-5 lh-1" title="@safeRating / 5">@filled@empty</div>
+                        <div class="text-muted small">@safeRating / 5</div>
+                    </div>
+                </div>
 
                 @if (!string.IsNullOrWhiteSpace(r.Comment))
                 {
-                    <div>@r.Comment</div>
+                    <div class="mt-2">@r.Comment</div>
+                }
+                else
+                {
+                    <div class="mt-2 text-muted fst-italic">No comment provided.</div>
                 }
             </div>
         }
     </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            const btn = document.getElementById("btnWriteReview");
+            if (!btn) return;
+
+            btn.addEventListener("click", function (e) {
+                const ok = confirm("You can write a review only after attending the event. Continue?");
+                if (!ok) e.preventDefault();
+            });
+        })();
+    </script>
 }

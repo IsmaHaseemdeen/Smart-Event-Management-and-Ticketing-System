@@ -26,7 +26,7 @@ namespace EventTicketingSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "USER",
+                name: "User",
                 columns: table => new
                 {
                     user_id = table.Column<int>(type: "int", nullable: false)
@@ -41,7 +41,7 @@ namespace EventTicketingSystem.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_USER", x => x.user_id);
+                    table.PrimaryKey("PK_User", x => x.user_id);
                     table.CheckConstraint("user_chk_role", "role IN ('ADMIN','STAFF','MEMBER')");
                     table.CheckConstraint("user_chk_status", "status IN ('ACTIVE','INACTIVE')");
                 });
@@ -65,28 +65,37 @@ namespace EventTicketingSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "member_profile",
+                name: "inquiry",
                 columns: table => new
                 {
-                    memberprofile_id = table.Column<int>(type: "int", nullable: false)
+                    inquiry_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    user_id = table.Column<int>(type: "int", nullable: false),
-                    full_name = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
-                    contact_number = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    password_hash = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    date_of_birth = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    city = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: false),
+                    user_id = table.Column<int>(type: "int", nullable: true),
+                    email = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
+                    subject = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    message = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    inquiry_type = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
                     status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    reply = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    replied_at = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    replied_by = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_member_profile", x => x.memberprofile_id);
+                    table.PrimaryKey("PK_inquiry", x => x.inquiry_id);
+                    table.CheckConstraint("inquiry_chk_status", "status IN ('OPEN','CLOSED')");
+                    table.CheckConstraint("inquiry_chk_type", "inquiry_type IN ('GENERAL','EVENT','MEMBERSHIP','TECHNICAL')");
                     table.ForeignKey(
-                        name: "member_profile_user_fk",
+                        name: "inquiry_user_fk",
+                        column: x => x.replied_by,
+                        principalTable: "User",
+                        principalColumn: "user_id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "inquiry_userid_fk",
                         column: x => x.user_id,
-                        principalTable: "USER",
+                        principalTable: "User",
                         principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -112,7 +121,7 @@ namespace EventTicketingSystem.Migrations
                     table.ForeignKey(
                         name: "event_user_fk",
                         column: x => x.created_by,
-                        principalTable: "USER",
+                        principalTable: "User",
                         principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -120,68 +129,6 @@ namespace EventTicketingSystem.Migrations
                         column: x => x.venue_id,
                         principalTable: "venue",
                         principalColumn: "venue_id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "inquiry",
-                columns: table => new
-                {
-                    inquiry_id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    memberprofile_id = table.Column<int>(type: "int", nullable: true),
-                    email = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
-                    subject = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    message = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    inquiry_type = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    reply = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    replied_at = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    replied_by = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_inquiry", x => x.inquiry_id);
-                    table.CheckConstraint("inquiry_chk_status", "status IN ('OPEN','CLOSED')");
-                    table.CheckConstraint("inquiry_chk_type", "inquiry_type IN ('GENERAL','EVENT','MEMBERSHIP','TECHNICAL','OTHER')");
-                    table.ForeignKey(
-                        name: "inquiry_member_profile_fk",
-                        column: x => x.memberprofile_id,
-                        principalTable: "member_profile",
-                        principalColumn: "memberprofile_id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "inquiry_user_fk",
-                        column: x => x.replied_by,
-                        principalTable: "USER",
-                        principalColumn: "user_id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "member_preference",
-                columns: table => new
-                {
-                    memberprofile_id = table.Column<int>(type: "int", nullable: false),
-                    category_id = table.Column<int>(type: "int", nullable: false),
-                    preference_level = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_member_preference", x => new { x.memberprofile_id, x.category_id });
-                    table.ForeignKey(
-                        name: "mp_cat_fk",
-                        column: x => x.category_id,
-                        principalTable: "category",
-                        principalColumn: "category_id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "mp_member_fk",
-                        column: x => x.memberprofile_id,
-                        principalTable: "member_profile",
-                        principalColumn: "memberprofile_id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -246,7 +193,7 @@ namespace EventTicketingSystem.Migrations
                 {
                     review_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    memberprofile_id = table.Column<int>(type: "int", nullable: false),
+                    user_id = table.Column<int>(type: "int", nullable: false),
                     event_id = table.Column<int>(type: "int", nullable: false),
                     rating = table.Column<int>(type: "int", nullable: false),
                     Comment = table.Column<string>(name: "\"Comment\"", type: "nvarchar(1000)", maxLength: 1000, nullable: true),
@@ -265,15 +212,15 @@ namespace EventTicketingSystem.Migrations
                         principalColumn: "event_id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "review_member_profile_fk",
-                        column: x => x.memberprofile_id,
-                        principalTable: "member_profile",
-                        principalColumn: "memberprofile_id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "review_user_fk",
                         column: x => x.isapproved_by,
-                        principalTable: "USER",
+                        principalTable: "User",
+                        principalColumn: "user_id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "review_userid_fk",
+                        column: x => x.user_id,
+                        principalTable: "User",
                         principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -284,7 +231,7 @@ namespace EventTicketingSystem.Migrations
                 {
                     booking_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    memberprofile_id = table.Column<int>(type: "int", nullable: false),
+                    user_id = table.Column<int>(type: "int", nullable: false),
                     session_id = table.Column<int>(type: "int", nullable: false),
                     booking_code = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     booking_date = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -305,15 +252,15 @@ namespace EventTicketingSystem.Migrations
                         principalColumn: "session_id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "booking_member_profile_fk",
-                        column: x => x.memberprofile_id,
-                        principalTable: "member_profile",
-                        principalColumn: "memberprofile_id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "booking_user_fk",
                         column: x => x.checkedin_by,
-                        principalTable: "USER",
+                        principalTable: "User",
+                        principalColumn: "user_id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "booking_userid_fk",
+                        column: x => x.user_id,
+                        principalTable: "User",
                         principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -419,14 +366,14 @@ namespace EventTicketingSystem.Migrations
                 column: "checkedin_by");
 
             migrationBuilder.CreateIndex(
-                name: "IX_booking_memberprofile_id",
-                table: "booking",
-                column: "memberprofile_id");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_booking_session_id",
                 table: "booking",
                 column: "session_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_booking_user_id",
+                table: "booking",
+                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_event_created_by",
@@ -449,25 +396,14 @@ namespace EventTicketingSystem.Migrations
                 column: "event_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_inquiry_memberprofile_id",
-                table: "inquiry",
-                column: "memberprofile_id");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_inquiry_replied_by",
                 table: "inquiry",
                 column: "replied_by");
 
             migrationBuilder.CreateIndex(
-                name: "IX_member_preference_category_id",
-                table: "member_preference",
-                column: "category_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_member_profile_user_id",
-                table: "member_profile",
-                column: "user_id",
-                unique: true);
+                name: "IX_inquiry_user_id",
+                table: "inquiry",
+                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_payment_booking_id",
@@ -486,9 +422,9 @@ namespace EventTicketingSystem.Migrations
                 column: "isapproved_by");
 
             migrationBuilder.CreateIndex(
-                name: "IX_review_memberprofile_id_event_id",
+                name: "IX_review_user_id_event_id",
                 table: "review",
-                columns: new[] { "memberprofile_id", "event_id" },
+                columns: new[] { "user_id", "event_id" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -498,8 +434,8 @@ namespace EventTicketingSystem.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_USER_email",
-                table: "USER",
+                name: "IX_User_email",
+                table: "User",
                 column: "email",
                 unique: true);
         }
@@ -515,9 +451,6 @@ namespace EventTicketingSystem.Migrations
 
             migrationBuilder.DropTable(
                 name: "inquiry");
-
-            migrationBuilder.DropTable(
-                name: "member_preference");
 
             migrationBuilder.DropTable(
                 name: "payment");
@@ -538,13 +471,10 @@ namespace EventTicketingSystem.Migrations
                 name: "event_session");
 
             migrationBuilder.DropTable(
-                name: "member_profile");
-
-            migrationBuilder.DropTable(
                 name: "event");
 
             migrationBuilder.DropTable(
-                name: "USER");
+                name: "User");
 
             migrationBuilder.DropTable(
                 name: "venue");

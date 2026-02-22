@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventTicketingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260221042418_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260222094808_MakeReviewApprovedByNullable")]
+    partial class MakeReviewApprovedByNullable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -107,10 +107,6 @@ namespace EventTicketingSystem.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("issued_at");
 
-                    b.Property<int>("MemberProfileId")
-                        .HasColumnType("int")
-                        .HasColumnName("memberprofile_id");
-
                     b.Property<int>("SessionId")
                         .HasColumnType("int")
                         .HasColumnName("session_id");
@@ -120,6 +116,10 @@ namespace EventTicketingSystem.Migrations
                         .HasColumnType("decimal(10,2)")
                         .HasColumnName("total_amount");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
                     b.HasKey("BookingId");
 
                     b.HasIndex("BookingCode")
@@ -127,9 +127,9 @@ namespace EventTicketingSystem.Migrations
 
                     b.HasIndex("CheckedInBy");
 
-                    b.HasIndex("MemberProfileId");
-
                     b.HasIndex("SessionId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("booking", null, t =>
                         {
@@ -323,10 +323,6 @@ namespace EventTicketingSystem.Migrations
                         .HasColumnType("nvarchar(30)")
                         .HasColumnName("inquiry_type");
 
-                    b.Property<int?>("MemberProfileId")
-                        .HasColumnType("int")
-                        .HasColumnName("memberprofile_id");
-
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -337,7 +333,7 @@ namespace EventTicketingSystem.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("replied_at");
 
-                    b.Property<int>("RepliedBy")
+                    b.Property<int?>("RepliedBy")
                         .HasColumnType("int")
                         .HasColumnName("replied_by");
 
@@ -358,109 +354,22 @@ namespace EventTicketingSystem.Migrations
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("subject");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
                     b.HasKey("InquiryId");
 
-                    b.HasIndex("MemberProfileId");
-
                     b.HasIndex("RepliedBy");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("inquiry", null, t =>
                         {
                             t.HasCheckConstraint("inquiry_chk_status", "status IN ('OPEN','CLOSED')");
 
-                            t.HasCheckConstraint("inquiry_chk_type", "inquiry_type IN ('GENERAL','EVENT','MEMBERSHIP','TECHNICAL','OTHER')");
+                            t.HasCheckConstraint("inquiry_chk_type", "inquiry_type IN ('GENERAL','EVENT','MEMBERSHIP','TECHNICAL')");
                         });
-                });
-
-            modelBuilder.Entity("EventTicketingSystem.Models.MemberPreference", b =>
-                {
-                    b.Property<int>("MemberProfileId")
-                        .HasColumnType("int")
-                        .HasColumnName("memberprofile_id");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("category_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("PreferenceLevel")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("preference_level");
-
-                    b.HasKey("MemberProfileId", "CategoryId");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("member_preference", (string)null);
-                });
-
-            modelBuilder.Entity("EventTicketingSystem.Models.MemberProfile", b =>
-                {
-                    b.Property<int>("MemberProfileId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("memberprofile_id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MemberProfileId"));
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("address");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("nvarchar(60)")
-                        .HasColumnName("city");
-
-                    b.Property<string>("ContactNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("contact_number");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("date_of_birth");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)")
-                        .HasColumnName("full_name");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("password_hash");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("status");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("MemberProfileId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("member_profile", (string)null);
                 });
 
             modelBuilder.Entity("EventTicketingSystem.Models.Payment", b =>
@@ -539,13 +448,9 @@ namespace EventTicketingSystem.Migrations
                         .HasColumnType("nvarchar(1)")
                         .HasColumnName("isapproved");
 
-                    b.Property<int>("IsApprovedBy")
+                    b.Property<int?>("IsApprovedBy")
                         .HasColumnType("int")
                         .HasColumnName("isapproved_by");
-
-                    b.Property<int>("MemberProfileId")
-                        .HasColumnType("int")
-                        .HasColumnName("memberprofile_id");
 
                     b.Property<int>("Rating")
                         .HasColumnType("int")
@@ -555,13 +460,17 @@ namespace EventTicketingSystem.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("review_date");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
                     b.HasKey("ReviewId");
 
                     b.HasIndex("EventId");
 
                     b.HasIndex("IsApprovedBy");
 
-                    b.HasIndex("MemberProfileId", "EventId")
+                    b.HasIndex("UserId", "EventId")
                         .IsUnique();
 
                     b.ToTable("review", null, t =>
@@ -665,7 +574,7 @@ namespace EventTicketingSystem.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("USER", null, t =>
+                    b.ToTable("User", null, t =>
                         {
                             t.HasCheckConstraint("user_chk_role", "role IN ('ADMIN','STAFF','MEMBER')");
 
@@ -747,13 +656,6 @@ namespace EventTicketingSystem.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("booking_user_fk");
 
-                    b.HasOne("EventTicketingSystem.Models.MemberProfile", "MemberProfile")
-                        .WithMany("Bookings")
-                        .HasForeignKey("MemberProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("booking_member_profile_fk");
-
                     b.HasOne("EventTicketingSystem.Models.EventSession", "Session")
                         .WithMany("Bookings")
                         .HasForeignKey("SessionId")
@@ -761,11 +663,18 @@ namespace EventTicketingSystem.Migrations
                         .IsRequired()
                         .HasConstraintName("booking_event_session_fk");
 
+                    b.HasOne("EventTicketingSystem.Models.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("booking_userid_fk");
+
                     b.Navigation("CheckedInByUser");
 
-                    b.Navigation("MemberProfile");
-
                     b.Navigation("Session");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EventTicketingSystem.Models.Event", b =>
@@ -824,53 +733,19 @@ namespace EventTicketingSystem.Migrations
 
             modelBuilder.Entity("EventTicketingSystem.Models.Inquiry", b =>
                 {
-                    b.HasOne("EventTicketingSystem.Models.MemberProfile", "MemberProfile")
-                        .WithMany("Inquiries")
-                        .HasForeignKey("MemberProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("inquiry_member_profile_fk");
-
                     b.HasOne("EventTicketingSystem.Models.Users", "RepliedByUser")
                         .WithMany("RepliedInquiries")
                         .HasForeignKey("RepliedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
                         .HasConstraintName("inquiry_user_fk");
 
-                    b.Navigation("MemberProfile");
+                    b.HasOne("EventTicketingSystem.Models.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("inquiry_userid_fk");
 
                     b.Navigation("RepliedByUser");
-                });
-
-            modelBuilder.Entity("EventTicketingSystem.Models.MemberPreference", b =>
-                {
-                    b.HasOne("EventTicketingSystem.Models.Category", "Category")
-                        .WithMany("MemberPreferences")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("mp_cat_fk");
-
-                    b.HasOne("EventTicketingSystem.Models.MemberProfile", "MemberProfile")
-                        .WithMany("Preferences")
-                        .HasForeignKey("MemberProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("mp_member_fk");
-
-                    b.Navigation("Category");
-
-                    b.Navigation("MemberProfile");
-                });
-
-            modelBuilder.Entity("EventTicketingSystem.Models.MemberProfile", b =>
-                {
-                    b.HasOne("EventTicketingSystem.Models.Users", "User")
-                        .WithOne("MemberProfile")
-                        .HasForeignKey("EventTicketingSystem.Models.MemberProfile", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("member_profile_user_fk");
 
                     b.Navigation("User");
                 });
@@ -900,21 +775,20 @@ namespace EventTicketingSystem.Migrations
                         .WithMany("ApprovedReviews")
                         .HasForeignKey("IsApprovedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
                         .HasConstraintName("review_user_fk");
 
-                    b.HasOne("EventTicketingSystem.Models.MemberProfile", "MemberProfile")
-                        .WithMany("Reviews")
-                        .HasForeignKey("MemberProfileId")
+                    b.HasOne("EventTicketingSystem.Models.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("review_member_profile_fk");
+                        .HasConstraintName("review_userid_fk");
 
                     b.Navigation("ApprovedByUser");
 
                     b.Navigation("Event");
 
-                    b.Navigation("MemberProfile");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EventTicketingSystem.Models.TicketType", b =>
@@ -939,8 +813,6 @@ namespace EventTicketingSystem.Migrations
             modelBuilder.Entity("EventTicketingSystem.Models.Category", b =>
                 {
                     b.Navigation("EventCategories");
-
-                    b.Navigation("MemberPreferences");
                 });
 
             modelBuilder.Entity("EventTicketingSystem.Models.Event", b =>
@@ -959,17 +831,6 @@ namespace EventTicketingSystem.Migrations
                     b.Navigation("TicketTypes");
                 });
 
-            modelBuilder.Entity("EventTicketingSystem.Models.MemberProfile", b =>
-                {
-                    b.Navigation("Bookings");
-
-                    b.Navigation("Inquiries");
-
-                    b.Navigation("Preferences");
-
-                    b.Navigation("Reviews");
-                });
-
             modelBuilder.Entity("EventTicketingSystem.Models.TicketType", b =>
                 {
                     b.Navigation("BookedTickets");
@@ -982,8 +843,6 @@ namespace EventTicketingSystem.Migrations
                     b.Navigation("CheckedInBookings");
 
                     b.Navigation("CreatedEvents");
-
-                    b.Navigation("MemberProfile");
 
                     b.Navigation("RepliedInquiries");
                 });

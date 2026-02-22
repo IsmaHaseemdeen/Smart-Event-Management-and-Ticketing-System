@@ -648,3 +648,13 @@ footer {
     border-radius: var(--radius-lg);
     display: block;
 }
+
+.ticket-chip.ticket-vip {
+    background: #C9A227;
+    color: #fff;
+}
+
+.ticket-chip.ticket-balcony {
+    background: #0B3D2E;
+    color: #fff;
+}

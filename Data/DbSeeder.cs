@@ -10,12 +10,12 @@ namespace EventTicketingSystem.Data
     {
         public static void Seed(ApplicationDbContext db)
         {
-            if (db.Users.Any())
+            if (db.Users.AsNoTracking().Any())
                 return;
 
             var now = DateTime.Now;
 
-            // Users
+            //Users
             var admin = new Users
             {
                 FullName = "Amelia Grant",
@@ -32,7 +32,7 @@ namespace EventTicketingSystem.Data
                 FullName = "Daniel Brooks",
                 Email = "daniel.brooks@council.com",
                 Phone = "07700 900117",
-                Password = "Staff#2026!",
+                Password = "Staff1#2026!",
                 Role = "STAFF",
                 Status = "ACTIVE",
                 CreatedAt = now.AddMonths(-8)
@@ -43,7 +43,7 @@ namespace EventTicketingSystem.Data
                 FullName = "Priya Shah",
                 Email = "priya.shah@council.com",
                 Phone = "07700 900204",
-                Password = "Staff#2026!",
+                Password = "Staff2#2026!",
                 Role = "STAFF",
                 Status = "ACTIVE",
                 CreatedAt = now.AddMonths(-8)
@@ -99,7 +99,7 @@ namespace EventTicketingSystem.Data
             // Venues
             var v1 = new Venue
             {
-                VenueName = "Barbican Centre — Main Hall",
+                VenueName = "Barbican Centre - Main Hall",
                 AddressLine1 = "Silk Street",
                 AddressLine2 = "Barbican",
                 City = "Oxford",
@@ -141,82 +141,7 @@ namespace EventTicketingSystem.Data
             db.Categories.AddRange(cMusic, cDrama, cDance, cArt, cWorkshop, cCulture);
             db.SaveChanges();
 
-            //Member Profile
-            var mp1 = new MemberProfile
-            {
-                UserId = m1.UserId,
-                FullName = m1.FullName,
-                ContactNumber = m1.Phone,
-                PasswordHash = "HASHED",
-                DateOfBirth = new DateTime(2001, 4, 18),
-                Address = "Flat 12, Redchurch Street",
-                City = "London",
-                Status = "ACTIVE",
-                CreatedAt = now.AddMonths(-6)
-            };
-
-            var mp2 = new MemberProfile
-            {
-                UserId = m2.UserId,
-                FullName = m2.FullName,
-                ContactNumber = m2.Phone,
-                PasswordHash = "HASHED",
-                DateOfBirth = new DateTime(2000, 9, 7),
-                Address = "27 Camden High Street",
-                City = "London",
-                Status = "ACTIVE",
-                CreatedAt = now.AddMonths(-6)
-            };
-
-            var mp3 = new MemberProfile
-            {
-                UserId = m3.UserId,
-                FullName = m3.FullName,
-                ContactNumber = m3.Phone,
-                PasswordHash = "HASHED",
-                DateOfBirth = new DateTime(2002, 1, 23),
-                Address = "8 Greenwich Church Street",
-                City = "London",
-                Status = "ACTIVE",
-                CreatedAt = now.AddMonths(-5)
-            };
-
-            var mp4 = new MemberProfile
-            {
-                UserId = m4.UserId,
-                FullName = m4.FullName,
-                ContactNumber = m4.Phone,
-                PasswordHash = "HASHED",
-                DateOfBirth = new DateTime(2001, 12, 2),
-                Address = "15 King’s Road",
-                City = "London",
-                Status = "ACTIVE",
-                CreatedAt = now.AddMonths(-5)
-            };
-
-            db.MemberProfiles.AddRange(mp1, mp2, mp3, mp4);
-            db.SaveChanges();
-
-            // Preferences
-            AddPref(db, mp1.MemberProfileId, cMusic.CategoryId, 5, now.AddMonths(-6));
-            AddPref(db, mp1.MemberProfileId, cCulture.CategoryId, 4, now.AddMonths(-6));
-            AddPref(db, mp1.MemberProfileId, cArt.CategoryId, 3, now.AddMonths(-6));
-
-            AddPref(db, mp2.MemberProfileId, cDrama.CategoryId, 5, now.AddMonths(-6));
-            AddPref(db, mp2.MemberProfileId, cWorkshop.CategoryId, 4, now.AddMonths(-6));
-            AddPref(db, mp2.MemberProfileId, cMusic.CategoryId, 2, now.AddMonths(-6));
-
-            AddPref(db, mp3.MemberProfileId, cArt.CategoryId, 5, now.AddMonths(-5));
-            AddPref(db, mp3.MemberProfileId, cDance.CategoryId, 3, now.AddMonths(-5));
-            AddPref(db, mp3.MemberProfileId, cCulture.CategoryId, 2, now.AddMonths(-5));
-
-            AddPref(db, mp4.MemberProfileId, cMusic.CategoryId, 4, now.AddMonths(-5));
-            AddPref(db, mp4.MemberProfileId, cDrama.CategoryId, 3, now.AddMonths(-5));
-            AddPref(db, mp4.MemberProfileId, cWorkshop.CategoryId, 2, now.AddMonths(-5));
-
-            db.SaveChanges();
-
-            // Events
+            //Events
             var finishedEvent = new Event
             {
                 Title = "London Winter Culture Gala 2025",
@@ -229,6 +154,32 @@ namespace EventTicketingSystem.Data
                 CreatedBy = admin.UserId,
                 Status = "FINISHED",
                 CreatedAt = now.AddMonths(-9)
+            };
+
+            var finishedEvent2 = new Event
+            {
+                Title = "Oxford Spring Theatre Night 2025",
+                Description =
+                    "A theatre evening featuring two compact stage dramas and a short spoken segment. " +
+                    "Audience guidance, timing, and seating assistance were managed carefully to reduce disruption.",
+                PosterUrl = "/Images/Posters/oxford-theatre-night.png",
+                VenueId = v1.VenueId,
+                CreatedBy = admin.UserId,
+                Status = "FINISHED",
+                CreatedAt = now.AddMonths(-8)
+            };
+
+            var finishedEvent3 = new Event
+            {
+                Title = "Cambridge Cultural Dance Festival 2025",
+                Description =
+                    "A multi-act dance programme with cultural segments and contemporary choreography. " +
+                    "Entry flow, intermission crowd control, and stage transitions were praised for being smooth.",
+                PosterUrl = "/Images/Posters/cambridge-dance-festival.png",
+                VenueId = v3.VenueId,
+                CreatedBy = admin.UserId,
+                Status = "FINISHED",
+                CreatedAt = now.AddMonths(-7)
             };
 
             var upcomingEvent = new Event
@@ -299,14 +250,24 @@ namespace EventTicketingSystem.Data
                 CreatedAt = now.AddDays(-16)
             };
 
-            db.Events.AddRange(finishedEvent, upcomingEvent, hybridEvent, artExpo, danceShowcase, workshopDay);
+            db.Events.AddRange(
+                finishedEvent, finishedEvent2, finishedEvent3,
+                upcomingEvent, hybridEvent, artExpo, danceShowcase, workshopDay
+            );
             db.SaveChanges();
 
             // Event Categories
             db.EventCategories.AddRange(
+
                 new EventCategory { EventId = finishedEvent.EventId, CategoryId = cCulture.CategoryId },
                 new EventCategory { EventId = finishedEvent.EventId, CategoryId = cDance.CategoryId },
                 new EventCategory { EventId = finishedEvent.EventId, CategoryId = cMusic.CategoryId },
+
+                new EventCategory { EventId = finishedEvent2.EventId, CategoryId = cDrama.CategoryId },
+                new EventCategory { EventId = finishedEvent2.EventId, CategoryId = cCulture.CategoryId },
+
+                new EventCategory { EventId = finishedEvent3.EventId, CategoryId = cDance.CategoryId },
+                new EventCategory { EventId = finishedEvent3.EventId, CategoryId = cCulture.CategoryId },
 
                 new EventCategory { EventId = upcomingEvent.EventId, CategoryId = cMusic.CategoryId },
                 new EventCategory { EventId = upcomingEvent.EventId, CategoryId = cCulture.CategoryId },
@@ -326,7 +287,7 @@ namespace EventTicketingSystem.Data
             );
             db.SaveChanges();
 
-            //Event Session
+            // Event Sessions
             var fe_s1 = new EventSession
             {
                 EventId = finishedEvent.EventId,
@@ -349,6 +310,32 @@ namespace EventTicketingSystem.Data
                 SessionStatus = "FINISHED",
                 Notes = "Clean sound mix; intermission was well timed with minimal crowding.",
                 TotalSeats = 2500,
+                ReservedSeats = 0,
+                SoldSeats = 0
+            };
+
+            var f2_s1 = new EventSession
+            {
+                EventId = finishedEvent2.EventId,
+                SessionDate = now.AddMonths(-6).Date,
+                StartDatetime = now.AddMonths(-6).Date.AddHours(18),
+                EndDatetime = now.AddMonths(-6).Date.AddHours(21),
+                SessionStatus = "FINISHED",
+                Notes = "Good pacing, clear announcements, and minimal late seating disruptions.",
+                TotalSeats = 1900,
+                ReservedSeats = 0,
+                SoldSeats = 0
+            };
+
+            var f3_s1 = new EventSession
+            {
+                EventId = finishedEvent3.EventId,
+                SessionDate = now.AddMonths(-5).Date,
+                StartDatetime = now.AddMonths(-5).Date.AddHours(19),
+                EndDatetime = now.AddMonths(-5).Date.AddHours(21),
+                SessionStatus = "FINISHED",
+                Notes = "Smooth intermission crowd control and clean stage transitions.",
+                TotalSeats = 1200,
                 ReservedSeats = 0,
                 SoldSeats = 0
             };
@@ -431,21 +418,21 @@ namespace EventTicketingSystem.Data
                 SoldSeats = 0
             };
 
-            db.EventSessions.AddRange(fe_s1, fe_s2, ue_s1, he_past, he_future, ax_s1, ds_s1, wd_s1);
+            db.EventSessions.AddRange(
+                fe_s1, fe_s2,
+                f2_s1, f3_s1,
+                ue_s1, he_past, he_future, ax_s1, ds_s1, wd_s1
+            );
             db.SaveChanges();
 
-            // Ticket Type
-            var allSessions = new[] { fe_s1, fe_s2, ue_s1, he_past, he_future, ax_s1, ds_s1, wd_s1 };
+            // Ticket Types
+            var allSessions = new[] { fe_s1, fe_s2, f2_s1, f3_s1, ue_s1, he_past, he_future, ax_s1, ds_s1, wd_s1 };
 
-            // Fixed 6 ticket type names
-            const string STD1 = "Standard - Saver";
-            const string STD2 = "Standard - Plus";
-            const string VIP1 = "VIP - Gold";
-            const string VIP2 = "VIP - Platinum";
-            const string BAL1 = "Balcony - Front";
-            const string BAL2 = "Balcony - Rear";
+            const string STD = "STANDARD";
+            const string VIP = "VIP";
+            const string BAL = "BALCONY";
 
-            decimal pStd1 = 18.00m, pStd2 = 25.00m, pVip1 = 45.00m, pVip2 = 60.00m, pBal1 = 30.00m, pBal2 = 38.00m;
+            decimal pStd = 18.00m, pVip = 45.00m, pBal = 30.00m;
 
             var tt = new Dictionary<int, Dictionary<string, TicketType>>();
 
@@ -453,31 +440,26 @@ namespace EventTicketingSystem.Data
             {
                 var list = new List<TicketType>
                 {
-                    new TicketType { SessionId = s.SessionId, TypeName = STD1, Price = pStd1, Status = "ACTIVE" },
-                    new TicketType { SessionId = s.SessionId, TypeName = STD2, Price = pStd2, Status = "ACTIVE" },
-
-                    new TicketType { SessionId = s.SessionId, TypeName = VIP1, Price = pVip1, Status = "ACTIVE" },
-                    new TicketType { SessionId = s.SessionId, TypeName = VIP2, Price = pVip2, Status = "ACTIVE" },
-
-                    new TicketType { SessionId = s.SessionId, TypeName = BAL1, Price = pBal1, Status = "ACTIVE" },
-                    new TicketType { SessionId = s.SessionId, TypeName = BAL2, Price = pBal2, Status = "ACTIVE" }
+                    new TicketType { SessionId = s.SessionId, TypeName = STD, Price = pStd, Status = "ACTIVE" },
+                    new TicketType { SessionId = s.SessionId, TypeName = VIP, Price = pVip, Status = "ACTIVE" },
+                    new TicketType { SessionId = s.SessionId, TypeName = BAL, Price = pBal, Status = "ACTIVE" }
                 };
 
                 db.TicketTypes.AddRange(list);
-                db.SaveChanges(); 
+                db.SaveChanges();
 
                 tt[s.SessionId] = list.ToDictionary(x => x.TypeName, x => x);
             }
 
-            // Bookings
+            //Bookings
             var att1 = new Booking
             {
-                MemberProfileId = mp1.MemberProfileId,
+                UserId = m1.UserId,
                 SessionId = fe_s1.SessionId,
                 BookingCode = "BK-LON-FE-3001",
                 BookingDate = fe_s1.StartDatetime.AddDays(-5),
                 BookingStatus = "CONFIRMED",
-                TotalAmount = (pStd1 * 2),
+                TotalAmount = (pStd * 2),
                 IssuedAt = fe_s1.StartDatetime.AddDays(-5).AddMinutes(20),
                 IsUsed = "Y",
                 CheckedInBy = staff1.UserId
@@ -485,12 +467,12 @@ namespace EventTicketingSystem.Data
 
             var att2 = new Booking
             {
-                MemberProfileId = mp2.MemberProfileId,
+                UserId = m2.UserId,
                 SessionId = fe_s2.SessionId,
                 BookingCode = "BK-LON-FE-3002",
                 BookingDate = fe_s2.StartDatetime.AddDays(-6),
                 BookingStatus = "CONFIRMED",
-                TotalAmount = (pBal1 * 1) + (pStd2 * 1),
+                TotalAmount = (pBal * 1) + (pStd * 1),
                 IssuedAt = fe_s2.StartDatetime.AddDays(-6).AddMinutes(15),
                 IsUsed = "Y",
                 CheckedInBy = staff2.UserId
@@ -498,97 +480,208 @@ namespace EventTicketingSystem.Data
 
             var att3 = new Booking
             {
-                MemberProfileId = mp3.MemberProfileId,
+                UserId = m3.UserId,
                 SessionId = fe_s2.SessionId,
                 BookingCode = "BK-LON-FE-3003",
                 BookingDate = fe_s2.StartDatetime.AddDays(-3),
                 BookingStatus = "CONFIRMED",
-                TotalAmount = (pVip2 * 1),
+                TotalAmount = (pVip * 1),
                 IssuedAt = fe_s2.StartDatetime.AddDays(-3).AddMinutes(10),
                 IsUsed = "Y",
                 CheckedInBy = staff1.UserId
             };
 
+            var f2_b1 = new Booking
+            {
+                UserId = m4.UserId,
+                SessionId = f2_s1.SessionId,
+                BookingCode = "BK-OXF-F2-5001",
+                BookingDate = f2_s1.StartDatetime.AddDays(-4),
+                BookingStatus = "CONFIRMED",
+                TotalAmount = (pStd * 2),
+                IssuedAt = f2_s1.StartDatetime.AddDays(-4).AddMinutes(14),
+                IsUsed = "Y",
+                CheckedInBy = staff2.UserId
+            };
+
+            var f2_b2 = new Booking
+            {
+                UserId = m1.UserId,
+                SessionId = f2_s1.SessionId,
+                BookingCode = "BK-OXF-F2-5002",
+                BookingDate = f2_s1.StartDatetime.AddDays(-2),
+                BookingStatus = "CONFIRMED",
+                TotalAmount = (pBal * 1),
+                IssuedAt = f2_s1.StartDatetime.AddDays(-2).AddMinutes(9),
+                IsUsed = "Y",
+                CheckedInBy = staff1.UserId
+            };
+
+            var f3_b1 = new Booking
+            {
+                UserId = m2.UserId,
+                SessionId = f3_s1.SessionId,
+                BookingCode = "BK-CAM-F3-6001",
+                BookingDate = f3_s1.StartDatetime.AddDays(-5),
+                BookingStatus = "CONFIRMED",
+                TotalAmount = (pStd * 2) + (pVip * 1),
+                IssuedAt = f3_s1.StartDatetime.AddDays(-5).AddMinutes(11),
+                IsUsed = "Y",
+                CheckedInBy = staff1.UserId
+            };
+
+            var f3_b2 = new Booking
+            {
+                UserId = m3.UserId,
+                SessionId = f3_s1.SessionId,
+                BookingCode = "BK-CAM-F3-6002",
+                BookingDate = f3_s1.StartDatetime.AddDays(-3),
+                BookingStatus = "CONFIRMED",
+                TotalAmount = (pBal * 2),
+                IssuedAt = f3_s1.StartDatetime.AddDays(-3).AddMinutes(16),
+                IsUsed = "Y",
+                CheckedInBy = staff2.UserId
+            };
+
             var att4 = new Booking
             {
-                MemberProfileId = mp4.MemberProfileId,
+                UserId = m4.UserId,
                 SessionId = he_past.SessionId,
                 BookingCode = "BK-LON-HE-4001",
                 BookingDate = he_past.StartDatetime.AddDays(-4),
                 BookingStatus = "CONFIRMED",
-                TotalAmount = (pStd1 * 2),
+                TotalAmount = (pStd * 2),
                 IssuedAt = he_past.StartDatetime.AddDays(-4).AddMinutes(12),
                 IsUsed = "Y",
                 CheckedInBy = staff2.UserId
             };
 
-            db.Bookings.AddRange(att1, att2, att3, att4);
+            db.Bookings.AddRange(att1, att2, att3, f2_b1, f2_b2, f3_b1, f3_b2, att4);
             db.SaveChanges();
 
+            // BookedTickets for past bookings
             db.BookedTickets.AddRange(
+
+                // F1
                 new BookedTickets
                 {
                     BookingId = att1.BookingId,
-                    TicketTypeId = tt[fe_s1.SessionId][STD1].TicketTypeId,
+                    TicketTypeId = tt[fe_s1.SessionId][STD].TicketTypeId,
                     Quantity = 2,
-                    UnitPrice = pStd1,
-                    LineTotal = pStd1 * 2
-                },
-
-                new BookedTickets
-                {
-                    BookingId = att2.BookingId,
-                    TicketTypeId = tt[fe_s2.SessionId][BAL1].TicketTypeId,
-                    Quantity = 1,
-                    UnitPrice = pBal1,
-                    LineTotal = pBal1
+                    UnitPrice = pStd,
+                    LineTotal = pStd * 2
                 },
                 new BookedTickets
                 {
                     BookingId = att2.BookingId,
-                    TicketTypeId = tt[fe_s2.SessionId][STD2].TicketTypeId,
+                    TicketTypeId = tt[fe_s2.SessionId][BAL].TicketTypeId,
                     Quantity = 1,
-                    UnitPrice = pStd2,
-                    LineTotal = pStd2
+                    UnitPrice = pBal,
+                    LineTotal = pBal
                 },
-
+                new BookedTickets
+                {
+                    BookingId = att2.BookingId,
+                    TicketTypeId = tt[fe_s2.SessionId][STD].TicketTypeId,
+                    Quantity = 1,
+                    UnitPrice = pStd,
+                    LineTotal = pStd
+                },
                 new BookedTickets
                 {
                     BookingId = att3.BookingId,
-                    TicketTypeId = tt[fe_s2.SessionId][VIP2].TicketTypeId,
+                    TicketTypeId = tt[fe_s2.SessionId][VIP].TicketTypeId,
                     Quantity = 1,
-                    UnitPrice = pVip2,
-                    LineTotal = pVip2
+                    UnitPrice = pVip,
+                    LineTotal = pVip
                 },
 
+                // F2
+                new BookedTickets
+                {
+                    BookingId = f2_b1.BookingId,
+                    TicketTypeId = tt[f2_s1.SessionId][STD].TicketTypeId,
+                    Quantity = 2,
+                    UnitPrice = pStd,
+                    LineTotal = pStd * 2
+                },
+                new BookedTickets
+                {
+                    BookingId = f2_b2.BookingId,
+                    TicketTypeId = tt[f2_s1.SessionId][BAL].TicketTypeId,
+                    Quantity = 1,
+                    UnitPrice = pBal,
+                    LineTotal = pBal
+                },
+
+                // F3
+                new BookedTickets
+                {
+                    BookingId = f3_b1.BookingId,
+                    TicketTypeId = tt[f3_s1.SessionId][STD].TicketTypeId,
+                    Quantity = 2,
+                    UnitPrice = pStd,
+                    LineTotal = pStd * 2
+                },
+                new BookedTickets
+                {
+                    BookingId = f3_b1.BookingId,
+                    TicketTypeId = tt[f3_s1.SessionId][VIP].TicketTypeId,
+                    Quantity = 1,
+                    UnitPrice = pVip,
+                    LineTotal = pVip
+                },
+                new BookedTickets
+                {
+                    BookingId = f3_b2.BookingId,
+                    TicketTypeId = tt[f3_s1.SessionId][BAL].TicketTypeId,
+                    Quantity = 2,
+                    UnitPrice = pBal,
+                    LineTotal = pBal * 2
+                },
+
+                // Hybrid past
                 new BookedTickets
                 {
                     BookingId = att4.BookingId,
-                    TicketTypeId = tt[he_past.SessionId][STD1].TicketTypeId,
+                    TicketTypeId = tt[he_past.SessionId][STD].TicketTypeId,
                     Quantity = 2,
-                    UnitPrice = pStd1,
-                    LineTotal = pStd1 * 2
+                    UnitPrice = pStd,
+                    LineTotal = pStd * 2
                 }
             );
             db.SaveChanges();
 
+            // Payments for past bookings (SUCCESS)
             db.Payments.AddRange(
                 new Payment { BookingId = att1.BookingId, Amount = att1.TotalAmount, Method = "CARD", PaymentStatus = "SUCCESS", PaidAt = att1.IssuedAt.AddMinutes(6), Notes = "Card payment confirmed." },
                 new Payment { BookingId = att2.BookingId, Amount = att2.TotalAmount, Method = "BANK_TRANSFER", PaymentStatus = "SUCCESS", PaidAt = att2.IssuedAt.AddMinutes(25), Notes = "Bank transfer verified." },
                 new Payment { BookingId = att3.BookingId, Amount = att3.TotalAmount, Method = "ONLINE_TRANSFER", PaymentStatus = "SUCCESS", PaidAt = att3.IssuedAt.AddMinutes(18), Notes = "Online transfer received." },
+
+                new Payment { BookingId = f2_b1.BookingId, Amount = f2_b1.TotalAmount, Method = "CARD", PaymentStatus = "SUCCESS", PaidAt = f2_b1.IssuedAt.AddMinutes(8), Notes = "Card payment confirmed." },
+                new Payment { BookingId = f2_b2.BookingId, Amount = f2_b2.TotalAmount, Method = "ONLINE_TRANSFER", PaymentStatus = "SUCCESS", PaidAt = f2_b2.IssuedAt.AddMinutes(20), Notes = "Online transfer received." },
+
+                new Payment { BookingId = f3_b1.BookingId, Amount = f3_b1.TotalAmount, Method = "CARD", PaymentStatus = "SUCCESS", PaidAt = f3_b1.IssuedAt.AddMinutes(10), Notes = "Card payment confirmed." },
+                new Payment { BookingId = f3_b2.BookingId, Amount = f3_b2.TotalAmount, Method = "BANK_TRANSFER", PaymentStatus = "SUCCESS", PaidAt = f3_b2.IssuedAt.AddMinutes(22), Notes = "Bank transfer verified." },
+
                 new Payment { BookingId = att4.BookingId, Amount = att4.TotalAmount, Method = "CARD", PaymentStatus = "SUCCESS", PaidAt = att4.IssuedAt.AddMinutes(9), Notes = "Card payment confirmed." }
             );
             db.SaveChanges();
 
+            // Update sold seats for finished sessions
             ApplySessionSoldSeats(db, fe_s1.SessionId);
             ApplySessionSoldSeats(db, fe_s2.SessionId);
+            ApplySessionSoldSeats(db, f2_s1.SessionId);
+            ApplySessionSoldSeats(db, f3_s1.SessionId);
             ApplySessionSoldSeats(db, he_past.SessionId);
 
             // Reviews
             db.Reviews.AddRange(
+
+                // F1
                 new Review
                 {
-                    MemberProfileId = mp1.MemberProfileId,
+                    UserId = m1.UserId,
                     EventId = finishedEvent.EventId,
                     Rating = 5,
                     Comment = "Really well run. Entry was quick, staff were helpful, and the programme flowed smoothly. Sound balance was excellent from our seats.",
@@ -598,7 +691,7 @@ namespace EventTicketingSystem.Data
                 },
                 new Review
                 {
-                    MemberProfileId = mp2.MemberProfileId,
+                    UserId = m2.UserId,
                     EventId = finishedEvent.EventId,
                     Rating = 4,
                     Comment = "Great atmosphere and strong performances. The venue signage and ushering made it easy to find seats. Intermission queueing was managed well.",
@@ -606,19 +699,55 @@ namespace EventTicketingSystem.Data
                     IsApproved = "Y",
                     IsApprovedBy = admin.UserId
                 },
+
+                // F2
                 new Review
                 {
-                    MemberProfileId = mp3.MemberProfileId,
-                    EventId = finishedEvent.EventId,
+                    UserId = m4.UserId,
+                    EventId = finishedEvent2.EventId,
                     Rating = 5,
-                    Comment = "Fantastic organisation and timing. Loved the closing cultural set — lighting and stage transitions were very professional.",
-                    ReviewDate = fe_s2.StartDatetime.AddDays(2),
+                    Comment = "Fantastic theatre night. Clear announcements, great pacing, and seating was managed without interruptions. Staff support was excellent.",
+                    ReviewDate = f2_s1.StartDatetime.AddDays(1),
                     IsApproved = "Y",
                     IsApprovedBy = admin.UserId
                 },
                 new Review
                 {
-                    MemberProfileId = mp4.MemberProfileId,
+                    UserId = m1.UserId,
+                    EventId = finishedEvent2.EventId,
+                    Rating = 4,
+                    Comment = "Very organised event with smooth entry checks. The show timing was accurate and the audience flow felt controlled.",
+                    ReviewDate = f2_s1.StartDatetime.AddDays(2),
+                    IsApproved = "Y",
+                    IsApprovedBy = admin.UserId
+                },
+
+                // F3
+                new Review
+                {
+                    UserId = m2.UserId,
+                    EventId = finishedEvent3.EventId,
+                    Rating = 5,
+                    Comment = "Beautiful dance programme and very professional organisation. Intermission and re-entry were handled smoothly with clear guidance.",
+                    ReviewDate = f3_s1.StartDatetime.AddDays(1),
+                    IsApproved = "Y",
+                    IsApprovedBy = admin.UserId
+                },
+                new Review
+                {
+                    UserId = m3.UserId,
+                    EventId = finishedEvent3.EventId,
+                    Rating = 4,
+                    Comment = "Great performances and good crowd control. Seating directions were clear and stage transitions were impressive.",
+                    ReviewDate = f3_s1.StartDatetime.AddDays(2),
+                    IsApproved = "Y",
+                    IsApprovedBy = admin.UserId
+                },
+
+                // Hybrid past (existing)
+                new Review
+                {
+                    UserId = m4.UserId,
                     EventId = hybridEvent.EventId,
                     Rating = 5,
                     Comment = "The stage setup was clear from most angles and the stewards kept everything moving. Looking forward to the upcoming session too.",
@@ -629,15 +758,15 @@ namespace EventTicketingSystem.Data
             );
             db.SaveChanges();
 
-            // Bookings - Upcoming
+            // Bookings Upcoming
             var b1 = new Booking
             {
-                MemberProfileId = mp1.MemberProfileId,
+                UserId = m1.UserId,
                 SessionId = ue_s1.SessionId,
                 BookingCode = "BK-LON-UE-1001",
                 BookingDate = now.AddDays(-4),
                 BookingStatus = "CONFIRMED",
-                TotalAmount = (pStd1 * 2) + (pVip1 * 1),
+                TotalAmount = (pStd * 2) + (pVip * 1),
                 IssuedAt = now.AddDays(-4).AddMinutes(12),
                 IsUsed = "N",
                 CheckedInBy = null
@@ -645,12 +774,12 @@ namespace EventTicketingSystem.Data
 
             var b2 = new Booking
             {
-                MemberProfileId = mp2.MemberProfileId,
+                UserId = m2.UserId,
                 SessionId = ue_s1.SessionId,
                 BookingCode = "BK-LON-UE-1002",
                 BookingDate = now.AddDays(-2),
                 BookingStatus = "PENDING",
-                TotalAmount = (pBal2 * 2),
+                TotalAmount = (pBal * 2),
                 IssuedAt = now.AddDays(-2).AddMinutes(7),
                 IsUsed = "N",
                 CheckedInBy = null
@@ -658,12 +787,12 @@ namespace EventTicketingSystem.Data
 
             var b3 = new Booking
             {
-                MemberProfileId = mp3.MemberProfileId,
+                UserId = m3.UserId,
                 SessionId = he_future.SessionId,
                 BookingCode = "BK-LON-HE-2001",
                 BookingDate = now.AddDays(-6),
                 BookingStatus = "CONFIRMED",
-                TotalAmount = (pStd2 * 2),
+                TotalAmount = (pStd * 2),
                 IssuedAt = now.AddDays(-6).AddMinutes(9),
                 IsUsed = "N",
                 CheckedInBy = null
@@ -676,36 +805,34 @@ namespace EventTicketingSystem.Data
                 new BookedTickets
                 {
                     BookingId = b1.BookingId,
-                    TicketTypeId = tt[ue_s1.SessionId][STD1].TicketTypeId,
+                    TicketTypeId = tt[ue_s1.SessionId][STD].TicketTypeId,
                     Quantity = 2,
-                    UnitPrice = pStd1,
-                    LineTotal = pStd1 * 2
+                    UnitPrice = pStd,
+                    LineTotal = pStd * 2
                 },
                 new BookedTickets
                 {
                     BookingId = b1.BookingId,
-                    TicketTypeId = tt[ue_s1.SessionId][VIP1].TicketTypeId,
+                    TicketTypeId = tt[ue_s1.SessionId][VIP].TicketTypeId,
                     Quantity = 1,
-                    UnitPrice = pVip1,
-                    LineTotal = pVip1
+                    UnitPrice = pVip,
+                    LineTotal = pVip
                 },
-
                 new BookedTickets
                 {
                     BookingId = b2.BookingId,
-                    TicketTypeId = tt[ue_s1.SessionId][BAL2].TicketTypeId,
+                    TicketTypeId = tt[ue_s1.SessionId][BAL].TicketTypeId,
                     Quantity = 2,
-                    UnitPrice = pBal2,
-                    LineTotal = pBal2 * 2
+                    UnitPrice = pBal,
+                    LineTotal = pBal * 2
                 },
-
                 new BookedTickets
                 {
                     BookingId = b3.BookingId,
-                    TicketTypeId = tt[he_future.SessionId][STD2].TicketTypeId,
+                    TicketTypeId = tt[he_future.SessionId][STD].TicketTypeId,
                     Quantity = 2,
-                    UnitPrice = pStd2,
-                    LineTotal = pStd2 * 2
+                    UnitPrice = pStd,
+                    LineTotal = pStd * 2
                 }
             );
             db.SaveChanges();
@@ -724,7 +851,7 @@ namespace EventTicketingSystem.Data
             db.Inquiries.AddRange(
                 new Inquiry
                 {
-                    MemberProfileId = null, // guest
+                    UserId = null, // guest
                     Email = "laura.mitchell@gmail.com",
                     Subject = "Seating view for balcony tickets",
                     Message = "Hi, do balcony seats at Royal Festival Hall have any restricted view sections for this event?",
@@ -737,7 +864,7 @@ namespace EventTicketingSystem.Data
                 },
                 new Inquiry
                 {
-                    MemberProfileId = null, // guest
+                    UserId = null, // guest
                     Email = "tom.edwards@outlook.com",
                     Subject = "Accessibility and step-free access",
                     Message = "Do you have step-free access and accessible seating options at Barbican Centre?",
@@ -750,7 +877,7 @@ namespace EventTicketingSystem.Data
                 },
                 new Inquiry
                 {
-                    MemberProfileId = mp2.MemberProfileId, // member
+                    UserId = m2.UserId, // member
                     Email = m2.Email,
                     Subject = "Updating my contact number",
                     Message = "Hi team, my phone number has changed. Where can I update it in my profile?",
@@ -763,22 +890,6 @@ namespace EventTicketingSystem.Data
                 }
             );
             db.SaveChanges();
-        }
-
-        private static void AddPref(ApplicationDbContext db, int memberProfileId, int categoryId, int level0to5, DateTime createdAt)
-        {
-            if (level0to5 < 0) level0to5 = 0;
-            if (level0to5 > 5) level0to5 = 5;
-
-            var pref = ((PreferenceLevel)level0to5).ToString(); // VeryLow..VeryHigh
-
-            db.MemberPreferences.Add(new MemberPreference
-            {
-                MemberProfileId = memberProfileId,
-                CategoryId = categoryId,
-                PreferenceLevel = pref,
-                CreatedAt = createdAt
-            });
         }
 
         private static void ApplySessionSoldSeats(ApplicationDbContext db, int sessionId)

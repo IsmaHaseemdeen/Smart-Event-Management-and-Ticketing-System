@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using EventTicketingSystem.Data;
 using EventTicketingSystem.Models;
 
@@ -37,154 +37,48 @@ namespace EventTicketingSystem.Controllers
             if (!IsMember()) return RedirectToLogin();
 
             var userId = UserId();
-            if (userId == null) return RedirectToLogin();
+            if (!userId.HasValue) return RedirectToLogin();
 
-            var profile = _context.MemberProfiles
-                .Include(p => p.Preferences)
-                .FirstOrDefault(p => p.UserId == userId.Value);
+            var user = _context.Users.FirstOrDefault(u => u.UserId == userId.Value);
+            if (user == null) return RedirectToLogin();
 
-            if (profile == null)
-            {
-                var user = _context.Users.FirstOrDefault(u => u.UserId == userId.Value);
-                if (user == null) return RedirectToLogin();
-
-                profile = new MemberProfile
-                {
-                    UserId = user.UserId,
-                    FullName = user.FullName ?? "",
-                    ContactNumber = user.Phone ?? "",
-                    PasswordHash = user.Password ?? "",
-                    DateOfBirth = null,
-                    Address = null,
-                    City = "unknown",
-                    Status = "ACTIVE",
-                    CreatedAt = DateTime.Now
-                };
-
-                _context.MemberProfiles.Add(profile);
-                _context.SaveChanges();
-            }
-
-            ViewBag.Categories = _context.Categories
-                .OrderBy(c => c.CategoryName)
-                .ToList();
-
-            return View(profile);
+            return View(user); 
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Profile(
-            int memberProfileId,
-            string fullName,
-            string contactNumber,
-            DateTime? dateOfBirth,
-            string? address,
-            string city,
-            string? status,
-            int[] selectedCategoryIds
-        )
+        public IActionResult Profile(string fullName, string phone)
         {
             if (!IsMember()) return RedirectToLogin();
 
             var userId = UserId();
-            if (userId == null) return RedirectToLogin();
+            if (!userId.HasValue) return RedirectToLogin();
 
             fullName = (fullName ?? "").Trim();
-            contactNumber = (contactNumber ?? "").Trim();
-            address = (address ?? "").Trim();
-            city = (city ?? "").Trim();
-            status = (status ?? "").Trim().ToUpperInvariant();
+            phone = (phone ?? "").Trim();
 
             if (string.IsNullOrWhiteSpace(fullName))
             {
-                ViewBag.Error = "Full name is required.";
-                return ReloadProfileForThisUser(userId.Value);
+                TempData["Err"] = "Full name is required.";
+                return RedirectToAction(nameof(Profile));
             }
 
-            if (string.IsNullOrWhiteSpace(contactNumber))
+            if (string.IsNullOrWhiteSpace(phone))
             {
-                ViewBag.Error = "Contact number is required.";
-                return ReloadProfileForThisUser(userId.Value);
+                TempData["Err"] = "Phone number is required.";
+                return RedirectToAction(nameof(Profile));
             }
 
-            if (string.IsNullOrWhiteSpace(city))
-            {
-                ViewBag.Error = "City is required.";
-                return ReloadProfileForThisUser(userId.Value);
-            }
+            var user = _context.Users.FirstOrDefault(u => u.UserId == userId.Value);
+            if (user == null) return RedirectToLogin();
 
-            if (status != "ACTIVE" && status != "INACTIVE")
-                status = "ACTIVE";
-
-            var profile = _context.MemberProfiles
-                .Include(p => p.Preferences)
-                .FirstOrDefault(p => p.MemberProfileId == memberProfileId && p.UserId == userId.Value);
-
-            if (profile == null) return NotFound();
-
-            profile.FullName = fullName;
-            profile.ContactNumber = contactNumber;
-            profile.DateOfBirth = dateOfBirth;
-            profile.Address = string.IsNullOrWhiteSpace(address) ? null : address;
-            profile.City = city;
-            profile.Status = status;
-
-            var levelDict = Request.Form
-                .Where(kvp => kvp.Key.StartsWith("preferenceLevels[", StringComparison.OrdinalIgnoreCase))
-                .ToDictionary(
-                    kvp =>
-                    {
-                        var key = kvp.Key;
-                        var start = key.IndexOf('[') + 1;
-                        var end = key.IndexOf(']');
-                        var idStr = (start > 0 && end > start) ? key.Substring(start, end - start) : "";
-                        return int.TryParse(idStr, out var id) ? id : -1;
-                    },
-                    kvp => int.TryParse(kvp.Value.ToString(), out var lvl) ? lvl : 2
-                );
-
-            var existing = _context.MemberPreferences
-                .Where(x => x.MemberProfileId == profile.MemberProfileId);
-
-            _context.MemberPreferences.RemoveRange(existing);
-
-            selectedCategoryIds = selectedCategoryIds ?? Array.Empty<int>();
-
-            foreach (var catId in selectedCategoryIds.Distinct())
-            {
-                if (!_context.Categories.Any(c => c.CategoryId == catId)) continue;
-
-                var lvl = levelDict.TryGetValue(catId, out var v) ? v : 2;
-                if (lvl < 0) lvl = 0;
-                if (lvl > 5) lvl = 5;
-
-                _context.MemberPreferences.Add(new MemberPreference
-                {
-                    MemberProfileId = profile.MemberProfileId,
-                    CategoryId = catId,
-                    PreferenceLevel = lvl.ToString(),
-                    CreatedAt = DateTime.Now
-                });
-            }
+            user.FullName = fullName;
+            user.Phone = phone;
 
             _context.SaveChanges();
 
             TempData["Success"] = "Profile updated successfully.";
             return RedirectToAction(nameof(Profile));
-        }
-
-        private IActionResult ReloadProfileForThisUser(int userId)
-        {
-            var profile = _context.MemberProfiles
-                .Include(p => p.Preferences)
-                .FirstOrDefault(p => p.UserId == userId);
-
-            ViewBag.Categories = _context.Categories
-                .OrderBy(c => c.CategoryName)
-                .ToList();
-
-            return View("Profile", profile);
         }
     }
 }

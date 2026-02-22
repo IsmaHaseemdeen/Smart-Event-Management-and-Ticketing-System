@@ -24,7 +24,7 @@
             display: block;
         }
 
-        /*  nav links  */
+        /* nav links */
         .navbar .nav-link {
             padding-top: 14px;
             padding-bottom: 14px;
@@ -40,11 +40,9 @@
                 <a class="navbar-brand d-flex align-items-center"
                    asp-controller="Home" asp-action="Index">
 
-                    <!-- logo -->
                     <img class="brand-logo"
                          src="~/Images/Logo.png"
                          alt="Watertown Cultural Council Logo" />
-
                 </a>
 
                 <button class="navbar-toggler" type="button"
@@ -69,85 +67,68 @@
                         var isGuest = !isLoggedIn;
                     }
 
-                    <!-- LEFT SIDE NAVIGATION -->
+                    <!-- LEFT -->
                     <ul class="navbar-nav me-auto">
 
-                        <!--Guest Navigation -->
                         @if (isGuest)
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Event" asp-action="Index">Events</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Inquiry" asp-action="Create">Submit Inquiry</a>
                             </li>
                         }
 
-                        <!--Member Navigation -->
                         @if (isMember)
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Event" asp-action="Index">Events</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Inquiry" asp-action="Create">Submit Inquiry</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Member" asp-action="Profile">My Profile</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Bookings" asp-action="MyBookings">My Bookings</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Inquiry" asp-action="My">My Inquiries</a>
                             </li>
                         }
 
-                        <!-- Admin Navigation -->
                         @if (isAdmin)
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Admin" asp-action="Index">Home</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="AdminEvents" asp-action="Index">Events</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="AdminCategories" asp-action="Index">Categories</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="AdminVenues" asp-action="Index">Venues</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="AdminReviews" asp-action="Index">Review Check</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="AdminInquiries" asp-action="Index">Inquiries</a>
                             </li>
                         }
 
-                        <!--Staff Navigation-->
                         @if (isStaff)
                         {
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Staff" asp-action="Verify">Verify Tickets</a>
                             </li>
@@ -155,7 +136,7 @@
 
                     </ul>
 
-                    <!-- RIGHT SIDE -->
+                    <!-- RIGHT -->
                     <ul class="navbar-nav">
 
                         @if (isGuest)
@@ -163,7 +144,6 @@
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="User" asp-action="Register">Register</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="User" asp-action="Login">Login</a>
                             </li>
@@ -173,7 +153,6 @@
                             <li class="nav-item">
                                 <span class="nav-link text-muted">@email</span>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="User" asp-action="Logout">Logout</a>
                             </li>
@@ -199,9 +178,11 @@
         </div>
     </footer>
 
+ -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>

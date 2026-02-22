@@ -1,7 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Register";
 
-    var toastMessage = TempData["ToastMessage"] as string ?? ViewBag.Error as string;
+    var toastMessage = TempData["ToastMessage"] as string;
     var toastType = TempData["ToastType"] as string ?? "danger";
 }
 
@@ -17,7 +17,7 @@
             <div class="card auth-card">
                 <div class="card-body">
 
-                    <form asp-action="Register" method="post" novalidate>
+                    <form asp-action="Register" method="post" class="needs-validation" novalidate>
                         @Html.AntiForgeryToken()
 
                         <div class="row g-3">
@@ -70,7 +70,6 @@
                                        minlength="6"
                                        required />
                                 <div class="invalid-feedback">Password must be at least 6 characters.</div>
-                                <div class="form-text">Use a strong password (mix letters and numbers).</div>
                             </div>
                         </div>
 
@@ -95,8 +94,9 @@
 
 @if (!string.IsNullOrWhiteSpace(toastMessage))
 {
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:1080;">
-        <div id="pageToast" class="toast align-items-center text-bg-@toastType border-0"
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 2000;">
+        <div id="pageToast"
+             class="toast align-items-center text-bg-@toastType border-0"
              role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body">@toastMessage</div>
@@ -109,22 +109,28 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
         (function () {
-            const forms = document.querySelectorAll('form[novalidate]');
-            Array.from(forms).forEach(form => {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) { event.preventDefault(); event.stopPropagation(); }
-                    form.classList.add('was-validated');
-                }, false);
-            });
+            const form = document.querySelector(".needs-validation");
+            if (!form) return;
+
+            form.addEventListener("submit", function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add("was-validated");
+            }, false);
         })();
 
         (function () {
-            const el = document.getElementById('pageToast');
+            const el = document.getElementById("pageToast");
             if (!el) return;
-            const toast = new bootstrap.Toast(el, { delay: 5000 });
-            toast.show();
+            if (typeof bootstrap === "undefined") return;
+
+            const t = new bootstrap.Toast(el, { delay: 5000 });
+            t.show();
         })();
     </script>
 }

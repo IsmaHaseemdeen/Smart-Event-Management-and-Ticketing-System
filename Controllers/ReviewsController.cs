@@ -30,7 +30,7 @@ namespace EventTicketingSystem.Controllers
         public IActionResult Index(int eventId)
         {
             var list = _context.Reviews
-                .Include(r => r.MemberProfile)
+                .Include(r => r.User) // ✅ changed
                 .Where(r => r.EventId == eventId && r.IsApproved == "Y")
                 .OrderByDescending(r => r.ReviewDate)
                 .ToList();
@@ -45,15 +45,12 @@ namespace EventTicketingSystem.Controllers
             if (!IsMember()) return RedirectToLogin();
 
             var userId = UserId()!.Value;
-            var profile = _context.MemberProfiles.FirstOrDefault(p => p.UserId == userId);
-            if (profile == null) return RedirectToAction("Profile", "Member");
-
             var now = DateTime.Now;
 
             var attended = _context.Bookings
                 .Include(b => b.Session)
                 .Any(b =>
-                    b.MemberProfileId == profile.MemberProfileId &&
+                    b.UserId == userId && // ✅ changed
                     b.BookingStatus == "CONFIRMED" &&
                     b.Session != null &&
                     b.Session.EventId == eventId &&
@@ -83,15 +80,12 @@ namespace EventTicketingSystem.Controllers
             }
 
             var userId = UserId()!.Value;
-            var profile = _context.MemberProfiles.FirstOrDefault(p => p.UserId == userId);
-            if (profile == null) return RedirectToAction("Profile", "Member");
-
             var now = DateTime.Now;
 
             var attended = _context.Bookings
                 .Include(b => b.Session)
                 .Any(b =>
-                    b.MemberProfileId == profile.MemberProfileId &&
+                    b.UserId == userId &&
                     b.BookingStatus == "CONFIRMED" &&
                     b.Session != null &&
                     b.Session.EventId == eventId &&
@@ -103,14 +97,14 @@ namespace EventTicketingSystem.Controllers
                 return RedirectToAction(nameof(Index), new { eventId });
             }
 
-            var exists = _context.Reviews.Any(r => r.EventId == eventId && r.MemberProfileId == profile.MemberProfileId);
+            var exists = _context.Reviews.Any(r => r.EventId == eventId && r.UserId == userId);
             if (exists)
                 return RedirectToAction(nameof(Index), new { eventId });
 
             var review = new Review
             {
                 EventId = eventId,
-                MemberProfileId = profile.MemberProfileId,
+                UserId = userId,
                 Rating = rating,
                 Comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim(),
                 ReviewDate = DateTime.Now,

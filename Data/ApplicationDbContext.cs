@@ -17,8 +17,6 @@ namespace EventTicketingSystem.Data
         public DbSet<EventCategory> EventCategories { get; set; } = null!;
         public DbSet<EventSession> EventSessions { get; set; } = null!;
         public DbSet<TicketType> TicketTypes { get; set; } = null!;
-        public DbSet<MemberProfile> MemberProfiles { get; set; } = null!;
-        public DbSet<MemberPreference> MemberPreferences { get; set; } = null!;
         public DbSet<Booking> Bookings { get; set; } = null!;
         public DbSet<BookedTickets> BookedTickets { get; set; } = null!;
         public DbSet<Payment> Payments { get; set; } = null!;
@@ -31,7 +29,7 @@ namespace EventTicketingSystem.Data
 
             modelBuilder.Entity<Users>(e =>
             {
-                e.ToTable("USER");
+                e.ToTable("User");
                 e.HasKey(x => x.UserId);
 
                 e.Property(x => x.UserId).HasColumnName("user_id");
@@ -147,11 +145,8 @@ namespace EventTicketingSystem.Data
                     .OnDelete(DeleteBehavior.Restrict);
 
                 e.ToTable(t => t.HasCheckConstraint("event_session_chk_status", "session_status IN ('ACTIVE','CANCELLED','FINISHED')"));
-
                 e.ToTable(t => t.HasCheckConstraint("event_session_ck_2", "reserved_seats >= 0 AND sold_seats >= 0"));
-
                 e.ToTable(t => t.HasCheckConstraint("event_session_ck_total", "total_seats > 0"));
-
                 e.ToTable(t => t.HasCheckConstraint("event_session_ck_capacity", "reserved_seats + sold_seats <= total_seats"));
             });
 
@@ -177,53 +172,6 @@ namespace EventTicketingSystem.Data
                 e.ToTable(t => t.HasCheckConstraint("ticket_type_chk_status", "status IN ('ACTIVE','CANCELLED','FINISHED')"));
             });
 
-            modelBuilder.Entity<MemberProfile>(e =>
-            {
-                e.ToTable("member_profile");
-                e.HasKey(x => x.MemberProfileId);
-
-                e.Property(x => x.MemberProfileId).HasColumnName("memberprofile_id");
-                e.Property(x => x.UserId).HasColumnName("user_id").IsRequired();
-                e.Property(x => x.FullName).HasColumnName("full_name").HasMaxLength(120).IsRequired();
-                e.Property(x => x.ContactNumber).HasColumnName("contact_number").HasMaxLength(20).IsRequired();
-                e.Property(x => x.PasswordHash).HasColumnName("password_hash").HasMaxLength(255).IsRequired();
-                e.Property(x => x.DateOfBirth).HasColumnName("date_of_birth");
-                e.Property(x => x.Address).HasColumnName("address").HasMaxLength(200);
-                e.Property(x => x.City).HasColumnName("city").HasMaxLength(60).IsRequired();
-                e.Property(x => x.Status).HasColumnName("status").HasMaxLength(20).IsRequired();
-                e.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
-
-                e.HasIndex(x => x.UserId).IsUnique();
-
-                e.HasOne(x => x.User)
-                    .WithOne(u => u.MemberProfile)
-                    .HasForeignKey<MemberProfile>(x => x.UserId)
-                    .HasConstraintName("member_profile_user_fk")
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            modelBuilder.Entity<MemberPreference>(e =>
-            {
-                e.ToTable("member_preference");
-                e.HasKey(x => new { x.MemberProfileId, x.CategoryId });
-
-                e.Property(x => x.MemberProfileId).HasColumnName("memberprofile_id");
-                e.Property(x => x.CategoryId).HasColumnName("category_id");
-                e.Property(x => x.PreferenceLevel).HasColumnName("preference_level").HasMaxLength(20);
-                e.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
-
-                e.HasOne(x => x.MemberProfile)
-                    .WithMany(m => m.Preferences)
-                    .HasForeignKey(x => x.MemberProfileId)
-                    .HasConstraintName("mp_member_fk")
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                e.HasOne(x => x.Category)
-                    .WithMany(c => c.MemberPreferences)
-                    .HasForeignKey(x => x.CategoryId)
-                    .HasConstraintName("mp_cat_fk")
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
 
             modelBuilder.Entity<Booking>(e =>
             {
@@ -231,7 +179,7 @@ namespace EventTicketingSystem.Data
                 e.HasKey(x => x.BookingId);
 
                 e.Property(x => x.BookingId).HasColumnName("booking_id");
-                e.Property(x => x.MemberProfileId).HasColumnName("memberprofile_id").IsRequired();
+                e.Property(x => x.UserId).HasColumnName("user_id").IsRequired(); 
                 e.Property(x => x.SessionId).HasColumnName("session_id").IsRequired();
                 e.Property(x => x.BookingCode).HasColumnName("booking_code").HasMaxLength(30).IsRequired();
                 e.Property(x => x.BookingDate).HasColumnName("booking_date").IsRequired();
@@ -245,10 +193,10 @@ namespace EventTicketingSystem.Data
 
                 e.HasIndex(x => x.BookingCode).IsUnique();
 
-                e.HasOne(x => x.MemberProfile)
-                    .WithMany(m => m.Bookings)
-                    .HasForeignKey(x => x.MemberProfileId)
-                    .HasConstraintName("booking_member_profile_fk")
+                e.HasOne(x => x.User)
+                    .WithMany() 
+                    .HasForeignKey(x => x.UserId)
+                    .HasConstraintName("booking_userid_fk")
                     .OnDelete(DeleteBehavior.Restrict);
 
                 e.HasOne(x => x.Session)
@@ -318,13 +266,18 @@ namespace EventTicketingSystem.Data
                 e.ToTable(t => t.HasCheckConstraint("payment_chk_status", "payment_status IN ('PENDING','SUCCESS','FAILED')"));
             });
 
+
             modelBuilder.Entity<Inquiry>(e =>
             {
                 e.ToTable("inquiry");
                 e.HasKey(x => x.InquiryId);
 
                 e.Property(x => x.InquiryId).HasColumnName("inquiry_id");
-                e.Property(x => x.MemberProfileId).HasColumnName("memberprofile_id");
+
+                e.Property(x => x.UserId)
+                    .HasColumnName("user_id")
+                    .IsRequired(false);
+
                 e.Property(x => x.Email).HasColumnName("email").HasMaxLength(120).IsRequired();
                 e.Property(x => x.Subject).HasColumnName("subject").HasMaxLength(150).IsRequired();
                 e.Property(x => x.Message).HasColumnName("message").HasMaxLength(1000).IsRequired();
@@ -332,13 +285,19 @@ namespace EventTicketingSystem.Data
                 e.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
                 e.Property(x => x.Status).HasColumnName("status").HasMaxLength(20).IsRequired();
                 e.Property(x => x.Reply).HasColumnName("reply").HasMaxLength(1000);
-                e.Property(x => x.RepliedAt).HasColumnName("replied_at");
-                e.Property(x => x.RepliedBy).HasColumnName("replied_by").IsRequired();
 
-                e.HasOne(x => x.MemberProfile)
-                    .WithMany(m => m.Inquiries)
-                    .HasForeignKey(x => x.MemberProfileId)
-                    .HasConstraintName("inquiry_member_profile_fk")
+                e.Property(x => x.RepliedAt)
+                    .HasColumnName("replied_at")
+                    .IsRequired(false);
+
+                e.Property(x => x.RepliedBy)
+                    .HasColumnName("replied_by")
+                    .IsRequired(false);
+
+                e.HasOne(x => x.User)
+                    .WithMany()
+                    .HasForeignKey(x => x.UserId)
+                    .HasConstraintName("inquiry_userid_fk")
                     .OnDelete(DeleteBehavior.Restrict);
 
                 e.HasOne(x => x.RepliedByUser)
@@ -348,9 +307,9 @@ namespace EventTicketingSystem.Data
                     .OnDelete(DeleteBehavior.Restrict);
 
                 e.ToTable(t => t.HasCheckConstraint("inquiry_chk_status", "status IN ('OPEN','CLOSED')"));
-               
                 e.ToTable(t => t.HasCheckConstraint("inquiry_chk_type", "inquiry_type IN ('GENERAL','EVENT','MEMBERSHIP','TECHNICAL')"));
             });
+
 
             modelBuilder.Entity<Review>(e =>
             {
@@ -358,20 +317,24 @@ namespace EventTicketingSystem.Data
                 e.HasKey(x => x.ReviewId);
 
                 e.Property(x => x.ReviewId).HasColumnName("review_id");
-                e.Property(x => x.MemberProfileId).HasColumnName("memberprofile_id").IsRequired();
+                e.Property(x => x.UserId).HasColumnName("user_id").IsRequired();
                 e.Property(x => x.EventId).HasColumnName("event_id").IsRequired();
                 e.Property(x => x.Rating).HasColumnName("rating").IsRequired();
                 e.Property(x => x.Comment).HasColumnName("\"Comment\"").HasMaxLength(1000);
                 e.Property(x => x.ReviewDate).HasColumnName("review_date").IsRequired();
                 e.Property(x => x.IsApproved).HasColumnName("isapproved").HasMaxLength(1).IsRequired();
-                e.Property(x => x.IsApprovedBy).HasColumnName("isapproved_by").IsRequired();
 
-                e.HasIndex(x => new { x.MemberProfileId, x.EventId }).IsUnique();
+               
+                e.Property(x => x.IsApprovedBy)
+                    .HasColumnName("isapproved_by")
+                    .IsRequired(false);
 
-                e.HasOne(x => x.MemberProfile)
-                    .WithMany(m => m.Reviews)
-                    .HasForeignKey(x => x.MemberProfileId)
-                    .HasConstraintName("review_member_profile_fk")
+                e.HasIndex(x => new { x.UserId, x.EventId }).IsUnique();
+
+                e.HasOne(x => x.User)
+                    .WithMany()
+                    .HasForeignKey(x => x.UserId)
+                    .HasConstraintName("review_userid_fk")
                     .OnDelete(DeleteBehavior.Restrict);
 
                 e.HasOne(x => x.Event)

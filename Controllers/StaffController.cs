@@ -58,7 +58,7 @@ namespace EventTicketingSystem.Controllers
             }
 
             var booking = _context.Bookings
-                .Include(b => b.MemberProfile)
+                .Include(b => b.User) // 
                 .Include(b => b.Session).ThenInclude(s => s.Event).ThenInclude(e => e.Venue)
                 .Include(b => b.BookedTickets).ThenInclude(bt => bt.TicketType)
                 .Include(b => b.Payment)
@@ -92,8 +92,8 @@ namespace EventTicketingSystem.Controllers
                 return View();
             }
 
-            // phone last 2 digits match
-            var phone = (booking.MemberProfile?.ContactNumber ?? "").Trim();
+            // phone last 2 digits match 
+            var phone = (booking.User?.Phone ?? "").Trim();
             if (phone.Length < 2 || !phone.EndsWith(phoneLast2))
             {
                 ViewBag.Result = "PHONE_MISMATCH";
@@ -111,7 +111,7 @@ namespace EventTicketingSystem.Controllers
 
             ViewBag.Result = "VALID";
             ViewBag.BookingCode = booking.BookingCode;
-            ViewBag.MemberName = booking.MemberProfile?.FullName ?? "";
+            ViewBag.MemberName = booking.User?.FullName ?? ""; 
             ViewBag.Qty = booking.BookedTickets?.Sum(x => x.Quantity) ?? 0;
 
             return View();

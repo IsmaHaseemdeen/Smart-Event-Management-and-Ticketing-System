@@ -10,7 +10,7 @@ namespace EventTicketingSystem.Models
         public int BookingId { get; set; }
 
         [Required]
-        public int MemberProfileId { get; set; }
+        public int UserId { get; set; }
 
         [Required]
         public int SessionId { get; set; }
@@ -39,7 +39,9 @@ namespace EventTicketingSystem.Models
         public int? CheckedInBy { get; set; } // nullable fk to users
 
         // navigation
-        public MemberProfile? MemberProfile { get; set; }
+
+        public Users? User { get; set; }
+
         public EventSession? Session { get; set; }
 
         public Users? CheckedInByUser { get; set; }

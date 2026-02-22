@@ -8,7 +8,7 @@ namespace EventTicketingSystem.Models
         [Key]
         public int InquiryId { get; set; }
 
-        public int? MemberProfileId { get; set; } // nullable
+        public int? UserId { get; set; } // nullable (guest inquiry)
 
         [Required]
         [StringLength(120)]
@@ -24,25 +24,24 @@ namespace EventTicketingSystem.Models
 
         [Required]
         [StringLength(30)]
-        public string InquiryType { get; set; } = "GENERAL"; // General/Event/Membership/Technical
+        public string InquiryType { get; set; } = "GENERAL";
 
         [Required]
         public DateTime CreatedAt { get; set; }
 
         [Required]
         [StringLength(20)]
-        public string Status { get; set; } = "OPEN"; // Open/Closed
+        public string Status { get; set; } = "OPEN";
 
         [StringLength(1000)]
         public string? Reply { get; set; }
 
         public DateTime? RepliedAt { get; set; }
 
-        [Required]
-        public int RepliedBy { get; set; } // fk to users - admin
+        public int? RepliedBy { get; set; }
 
         // navigation
-        public MemberProfile? MemberProfile { get; set; }
+        public Users? User { get; set; }
         public Users? RepliedByUser { get; set; }
     }
 }
