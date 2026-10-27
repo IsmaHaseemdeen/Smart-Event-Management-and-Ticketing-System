@@ -2,90 +2,51 @@
 
 ## Project Overview
 
-The Smart Event Management and Ticketing System is a full-stack web application developed using **ASP.NET Core MVC, C#, Microsoft SQL Server, and Entity Framework Core**.
+The **Smart Event Management and Ticketing System** is a full-stack web application developed using **ASP.NET Core MVC, C#, Microsoft SQL Server, and Entity Framework Core**.
 
-The project addresses the digital event management requirements of a metropolitan cultural council, providing a centralized platform for discovering cultural events, booking tickets, managing event operations, and verifying attendee admission.
+The application was developed for an academic scenario involving a metropolitan cultural council seeking to modernize cultural event management, ticket reservations, and attendance verification.
 
-The system supports four distinct user roles — **Guest, Member, Staff, and Administrator** — with role-based functionality and access restrictions.
+The system provides a centralized platform for event discovery, ticket booking, venue management, reviews, inquiries, and administrative operations.
+
+It supports four user roles: **Guest, Member, Staff, and Administrator**, each with distinct permissions and functionality.
 
 **Project Type:** Full-Stack Web Application  
 **Architecture:** Model-View-Controller (MVC)  
 **Backend:** C# and ASP.NET Core MVC  
 **Database:** Microsoft SQL Server  
-**ORM:** Entity Framework Core  
-**Frontend:** HTML, CSS, Bootstrap, and JavaScript  
-**Status:** Academic web application project
+**Frontend:** HTML, CSS, Bootstrap, JavaScript  
+**Project Status:** Developed Academic Web Application
 
 ---
 
 ## 1. Business Problem
 
-Cultural organizations require efficient systems to manage events, ticket availability, reservations, and attendee verification.
+Traditional event management processes can create operational challenges for cultural organizations, including:
 
-Traditional or fragmented event management processes can create operational challenges, including:
+- Inefficient event scheduling and administration.
+- Limited visibility into ticket availability.
+- Fragmented event information and public communication.
+- Difficulties managing ticket reservations.
+- Manual attendee verification.
+- Limited mechanisms for collecting feedback.
+- Inconsistent coordination between event organizers and attendees.
 
-- Inefficient event administration
-- Difficulty managing venues and schedules
-- Limited visibility into ticket availability
-- Manual booking and attendance verification
-- Inconsistent communication with attendees
-- Difficulty gathering and moderating event feedback
+The system addresses these challenges through an integrated event management and ticketing platform.
 
-This project provides a centralized web application designed to address these challenges.
+## 2. System Objectives
 
-## 2. Application Features
+The project's primary objectives were to:
 
-### Guest Module
-
-Guests can:
-
-- Browse available and upcoming events
-- Search events by category, city, venue, and date
-- View event information and approved reviews
-- Submit general inquiries
-- Register for a member account
-
-Ticket pricing and booking functionality are restricted to authenticated members.
-
-### Member Module
-
-Registered members can:
-
-- Register and sign in
-- Browse and filter cultural events
-- View event details and available ticket types
-- Select ticket quantities
-- Create ticket bookings
-- View booking and payment statuses
-- Access booking history
-- Update permitted profile information
-- Submit reviews for attended events
-- Send inquiries to administrators
-
-### Administrator Module
-
-Administrators can:
-
-- Access the administrative dashboard
-- Create, update, and manage events
-- Manage venues and event categories
-- Manage event sessions and availability
-- Moderate user-submitted reviews
-- Review and respond to inquiries
-- Manage relevant administrative operations
-
-### Staff Module
-
-Staff members can:
-
-- Access event check-in functionality
-- Verify attendee booking information
-- Validate booking codes
-- Confirm identifying phone-number digits
-- Check booking and payment eligibility
-- Record verified attendance
-
-The application separates these responsibilities through role-based access control.
+- Develop a centralized web-based event management application.
+- Provide event browsing and filtering functionality.
+- Enable registered members to book event tickets.
+- Manage event sessions, venues, categories, and availability.
+- Implement role-based authentication and authorization.
+- Support event reviews and inquiry submission.
+- Provide administrative event management functionality.
+- Enable staff to verify bookings during event check-in.
+- Develop and implement a relational SQL Server database.
+- Demonstrate functional testing and database validation.
 
 ---
 
@@ -93,17 +54,17 @@ The application separates these responsibilities through role-based access contr
 
 | Technology | Purpose |
 |---|---|
-| C# | Backend programming and application logic |
-| ASP.NET Core MVC | Web application development |
-| Entity Framework Core | Object-relational mapping and data access |
-| Microsoft SQL Server | Relational database management |
-| SQL Server Management Studio | Database administration and testing |
+| C# | Backend application programming |
+| ASP.NET Core MVC | Web application framework |
+| Entity Framework Core | Object-relational mapping |
+| Microsoft SQL Server | Relational database |
+| SQL Server Management Studio | Database administration and SQL execution |
 | Oracle SQL Developer Data Modeler | Logical and relational database design |
 | HTML | Interface structure |
-| CSS | Interface styling |
-| Bootstrap | Responsive UI components |
+| CSS | Styling |
+| Bootstrap | Responsive user interface |
 | JavaScript | Client-side interactions |
-| Visual Studio | Application development environment |
+| Visual Studio | Development environment |
 
 ---
 
@@ -113,38 +74,190 @@ The application follows a three-tier architecture.
 
 ### Presentation Layer
 
-ASP.NET MVC views, HTML, CSS, Bootstrap, and JavaScript provide the user-facing interfaces for event browsing, booking, administration, and ticket verification.
+Developed using Razor views, HTML, CSS, Bootstrap, and JavaScript.
+
+This layer provides the interfaces for event browsing, user authentication, ticket booking, administration, and check-in verification.
 
 ### Application Logic Layer
 
-ASP.NET MVC controllers handle requests, perform business operations, apply validation rules, and enforce role-based permissions.
+ASP.NET Core MVC controllers handle requests, enforce business rules, validate user input, and coordinate operations between views and database models.
 
 ### Data Layer
 
-Microsoft SQL Server stores event records, users, bookings, payments, reviews, inquiries, and related information.
+Microsoft SQL Server manages persistent application data, including users, events, event sessions, ticket types, bookings, payments, reviews, and inquiries.
 
-Entity Framework Core connects the application to the database and manages entity relationships.
+Entity Framework Core connects the application to the relational database.
 
 ---
 
-## 5. Database Design and Implementation
+## 5. Application Features and Screenshots
 
-The database was designed using Oracle SQL Developer Data Modeler and implemented using Microsoft SQL Server.
+### 5.1 Homepage
 
-The project includes:
+The homepage provides an overview of the metropolitan cultural council and upcoming cultural events.
 
-- Entity-Relationship Diagram (ERD)
-- Logical and relational database models
-- Data dictionary
-- Primary and foreign keys
-- Unique and check constraints
-- Entity Framework Core models
-- Database migrations
-- Sample data seeding
-- SQL INSERT statements
-- SQL SELECT queries and validation
+Users can explore general information, browse upcoming events, register, log in, and submit inquiries.
 
-### Main Database Entities
+![Homepage - Main Interface](images/Homepage1.jpg)
+
+![Homepage - Council Overview](images/Homepage2.jpg)
+
+![Homepage - Upcoming Events](images/Homepage3.jpg)
+
+![Homepage - Additional Information](images/Homepage4.jpg)
+
+### 5.2 Event Browsing and Searching
+
+The application provides an event discovery interface where users can browse cultural events and search using different criteria.
+
+Available filtering options include:
+
+- Event category
+- City
+- Venue
+- Event date
+
+![Event Listings - View 1](images/EventsPage1.jpg)
+
+![Event Listings - View 2](images/EventsPage2.jpg)
+
+![Event Listings - View 3](images/EventsPage3.jpg)
+
+#### Event Filtering
+
+![Event Filtering](images/EventsFiltering.png)
+
+### 5.3 Ticket Booking System
+
+Authenticated members can select event sessions, view available ticket types, and choose ticket quantities.
+
+The booking workflow includes:
+
+1. Selecting an event.
+2. Choosing an event session.
+3. Viewing available ticket types.
+4. Selecting ticket quantities.
+5. Validating seat availability.
+6. Calculating the booking total.
+7. Creating the booking record.
+8. Viewing the booking and payment status.
+
+#### Ticket Selection
+
+![Ticket Selection](images/Ticketing.jpg)
+
+#### Booking Before Payment Confirmation
+
+![Booking Before Payment](images/Ticketing%28Before%20Payment%29.jpg)
+
+#### Booking After Payment Confirmation
+
+![Booking After Payment](images/Ticketing%28After%20Payment%29.jpg)
+
+**Note:** The academic application demonstrates payment confirmation and payment-status management, but a live payment gateway was not integrated.
+
+### 5.4 Member Booking Management
+
+Members can view their existing reservations and inspect booking details.
+
+The booking interface provides information such as:
+
+- Event name
+- Event session
+- Booking reference
+- Ticket quantity
+- Total amount
+- Booking status
+- Payment status
+
+#### My Bookings
+
+![Member Booking History](images/BookingsPage.jpg)
+
+#### Booking Details
+
+![Booking Details](images/BookingDetails.jpg)
+
+### 5.5 Administrator Module
+
+The administrator module provides management functionality for events, venues, categories, sessions, inquiries, and reviews.
+
+Administrators can access system information and perform role-restricted management tasks.
+
+#### Administrator Dashboard
+
+![Admin Dashboard - Overview](images/AdminHomepage1.jpg)
+
+![Admin Dashboard - Additional Information](images/AdminHomepage2.jpg)
+
+#### Event Management
+
+Administrators can create, update, and manage event records.
+
+They can also manage event sessions, associated categories, venues, and event availability.
+
+![Admin Event Management](images/AdminUpdateEvents.jpg)
+
+### 5.6 Staff Module — Ticket Verification
+
+Staff members can verify attendee bookings during event check-in.
+
+The verification process involves:
+
+- Entering the booking code.
+- Entering the last two digits of the member's registered phone number.
+- Validating booking records.
+- Checking booking and payment eligibility.
+- Recording successful attendance verification.
+
+![Staff Ticket Verification](images/Staff%20Verify%20CheckIns.jpg)
+
+### 5.7 Additional User Features
+
+The academic application also includes:
+
+**Member Registration and Login**
+- Account registration
+- Credential-based authentication
+- Member role assignment
+
+**Reviews**
+- Review submission by eligible attendees
+- Event ratings and comments
+- Administrator review moderation
+
+**Inquiries**
+- Guest inquiry submission
+- Member inquiry submission
+- Administrative inquiry handling and responses
+
+**Profile Management**
+- Member profile information
+- Permitted contact-information updates
+
+---
+
+## 6. Database Design
+
+The system's database was modelled using Oracle SQL Developer Data Modeler and implemented with Microsoft SQL Server.
+
+The project demonstrates database planning, relational modelling, schema implementation, and data validation.
+
+### 6.1 Entity-Relationship Diagram
+
+The ERD illustrates the database entities and relationships supporting event management, ticket reservations, payments, and user interactions.
+
+![Database Entity Relationship Diagram](images/Database-%20ERD.png)
+
+### 6.2 Relational Database Model
+
+The relational model demonstrates how the entities are structured into related tables, including primary keys, foreign keys, and other constraints.
+
+![Database Relational Model](images/Database-Relational%20Model.png)
+
+### 6.3 Main Database Entities
+
+The database includes 12 primary entities:
 
 1. User
 2. Venue
@@ -154,234 +267,79 @@ The project includes:
 6. Event Session
 7. Ticket Type
 8. Booking
-9. Booked Ticket
+9. Booked Tickets
 10. Payment
 11. Review
 12. Inquiry
 
-### Entity-Relationship Diagram
+### 6.4 Database Constraints
 
-![Database ER Diagram](images/database-erd.png)
+The project demonstrates:
 
-### Relational Database Model
+- Primary key constraints
+- Foreign key constraints
+- Composite keys
+- Unique constraints
+- Check constraints
+- Default constraints
+- Not-null constraints
+- Data type validation
+- Referential integrity
 
-![Relational Database Model](images/database-relational-model.png)
+### 6.5 Database Implementation
 
----
+Database implementation activities included:
 
-## 6. Application Screenshots
-
-The following screenshots demonstrate the interfaces developed for the project.
-
-### Homepage and Upcoming Events
-
-![Application Homepage](images/homepage.png)
-
-### Event Browsing and Filtering
-
-![Event Browsing](images/events.png)
-
-### Ticket Booking
-
-![Ticket Booking](images/ticket-booking.png)
-
-### Booking Confirmation
-
-![Booking Confirmation](images/booking-confirmation.png)
-
-### Administrator Dashboard
-
-![Administrator Dashboard](images/admin-dashboard.png)
-
-### Staff Ticket Verification
-
-![Staff Check-in Verification](images/staff-checkin.png)
+- Creating relational tables
+- Defining entity relationships
+- Implementing Entity Framework Core models
+- Configuring `ApplicationDbContext`
+- Applying Entity Framework Core migrations
+- Populating sample records
+- Executing SQL INSERT statements
+- Retrieving records using SELECT queries
+- Validating stored data
 
 ---
 
-## 7. Ticket Booking Workflow
+## 7. Authentication and Role-Based Access Control
 
-The application provides a structured ticket booking process.
+The application implements role-specific functionality.
 
-1. A member signs in.
-2. The member browses available events.
-3. An event and session are selected.
-4. Available ticket types and prices are displayed.
-5. The member selects the required ticket quantities.
-6. The application validates availability and calculates the booking amount.
-7. A booking record and unique booking code are generated.
-8. Booking and payment status information can be reviewed.
-9. Eligible bookings can be verified by authorized event staff.
+| Functionality | Guest | Member | Staff | Administrator |
+|---|---|---|---|---|
+| Browse Events | Yes | Yes | Yes | Yes |
+| View Ticket Prices | No | Yes | No | Yes |
+| Book Tickets | No | Yes | No | No |
+| View Personal Bookings | No | Yes | No | No |
+| Submit Reviews | No | Yes | No | No |
+| Submit Inquiries | Yes | Yes | No | No |
+| Manage Events | No | No | No | Yes |
+| Manage Venues | No | No | No | Yes |
+| Moderate Reviews | No | No | No | Yes |
+| Handle Inquiries | No | No | No | Yes |
+| Verify Attendee Check-ins | No | No | Yes | No |
 
-**Payment limitation:** The academic application demonstrates booking and payment-status workflows but does not integrate a live payment gateway.
-
----
-
-## 8. Authentication and Authorization
-
-The system provides role-based authentication and access control.
-
-| User Role | Primary Permissions |
-|---|---|
-| Guest | Browse events, read approved reviews, submit inquiries, register |
-| Member | Book tickets, manage bookings, submit reviews, update profile |
-| Staff | Verify attendee check-ins |
-| Administrator | Manage events, venues, categories, reviews, and inquiries |
-
-This design separates public-facing functionality from restricted member, staff, and administrator operations.
+Role-based authorization separates public functionality from sensitive booking, management, and operational activities.
 
 ---
 
-## 9. Database Operations
+## 8. Testing and Validation
 
-The project demonstrates practical database development and manipulation.
+The project includes documented functional and database testing.
 
-### Database Implementation
+### Functional Testing
 
-- Relational table creation
-- Referential integrity constraints
-- Entity relationships
-- Database migrations
-- Seed data generation
+The testing activities covered:
 
-### SQL Operations
-
-- Creating and updating database records
-- Inserting sample data
-- Retrieving event and venue information
-- Retrieving member booking records
-- Checking ticket availability
-- Reviewing payment statuses
-- Retrieving approved event reviews
-- Identifying unanswered inquiries
-
----
-
-## 10. Testing and Validation
-
-The academic project documentation includes functional testing, database testing, and test cases.
-
-Testing scenarios cover:
-
-- User registration and authentication
-- Event browsing and search
-- Ticket selection and booking
-- Ticket availability validation
-- Booking and payment statuses
-- Review eligibility and submission
-- Guest inquiry submission
+- User registration
+- User authentication
+- Event browsing and filtering
+- Ticket booking
+- Booking confirmation
+- Seat availability validation
+- Member booking history
+- Review submission
+- Inquiry submission
 - Administrative event management
-- Staff ticket verification
-- Database integrity and constraints
-
-The testing documentation provides evidence of development-time validation. The repository does not claim production-level security or load testing.
-
----
-
-## 11. Project Structure
-
-The existing repository follows the ASP.NET MVC project structure.
-
-- `Areas/Identity/Pages/` — identity-related pages
-- `Controllers/` — request handling and application logic
-- `Data/` — database context and data-related classes
-- `Migrations/` — Entity Framework Core database migrations
-- `Models/` — domain and application models
-- `Properties/` — development configuration
-- `Views/` — Razor views and page layouts
-- `wwwroot/` — static CSS, JavaScript, images, and other assets
-- `Program.cs` — application startup and configuration
-- `appsettings.json` — application configuration
-- `EventTicketingSystem.csproj` — .NET project definition
-- `EventTicketingSystem.slnx` — Visual Studio solution
-
----
-
-## 12. Local Setup
-
-### Prerequisites
-
-- .NET SDK compatible with the project target framework
-- Microsoft SQL Server
-- Visual Studio or another compatible .NET development environment
-
-### Running the Application
-
-1. Clone the repository.
-2. Open the solution in Visual Studio or navigate to the project directory using a terminal.
-3. Restore the project dependencies.
-4. Configure a local SQL Server database connection in the application's local configuration.
-5. Apply the Entity Framework Core migrations according to the project's configuration.
-6. Build and run the ASP.NET Core application.
-
-Basic terminal commands:
-
-```bash
-dotnet restore
-dotnet build
-dotnet run
-```
-
-Database initialization requires an appropriate local SQL Server connection and the EF Core migration tooling used by the project.
-
-Do not use production credentials or publicly committed database passwords.
-
----
-
-## 13. Skills Demonstrated
-
-### Full-Stack Web Development
-
-- C# Programming
-- ASP.NET Core MVC
-- Backend Development
-- HTML, CSS, and JavaScript
-- Bootstrap
-- Authentication and Authorization
-- Role-Based Access Control
-- Form Validation
-
-### Database Development
-
-- Microsoft SQL Server
-- Entity Framework Core
-- Database Schema Design
-- Entity-Relationship Modelling
-- Database Normalization
-- SQL Queries
-- Data Seeding
-- Database Migrations
-- Primary Key and Foreign Key Constraints
-
-### Software Engineering
-
-- Requirements Analysis
-- MVC Architecture
-- Modular Application Design
-- Business Logic Implementation
-- Functional Testing
-- Database Testing
-- Debugging
-- Technical Documentation
-
----
-
-## 14. Project Documentation
-
-The academic project report documents the system's requirements, database models, implementation, application interfaces, testing, and development reflections.
-
-[View Project Documentation](docs/Smart_Event_Management_Report.pdf)
-
----
-
-## 15. Academic Context
-
-This project was developed as an academic coursework application based on a metropolitan cultural council's event management and ticketing requirements.
-
-It demonstrates the application of full-stack web development, relational database design, MVC architecture, role-based access control, and software testing in an integrated software project.
-
-## Disclaimer
-
-This is an academic demonstration project and is not a production ticketing platform.
-
-Live payment gateway integration and production deployment are outside the demonstrated project scope. Sample events, accounts, and booking records are intended for testing and demonstration.
+-
